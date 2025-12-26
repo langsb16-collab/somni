@@ -12,7 +12,7 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.use('/api/*', cors())
 
 // Serve static files
-app.use('/static/*', serveStatic({ root: './public' }))
+app.use('/static/*', serveStatic({ root: './' }))
 
 // ==================== API Routes ====================
 
@@ -326,12 +326,374 @@ app.get('/api/dashboard', async (c) => {
   }
 })
 
+// ==================== Wellness API ====================
+
+// Get all music content
+app.get('/api/wellness/music', async (c) => {
+  try {
+    const { DB } = c.env
+    const category = c.req.query('category')
+    let query = 'SELECT * FROM music_content WHERE 1=1'
+    const params: any[] = []
+    
+    if (category) {
+      query += ' AND category = ?'
+      params.push(category)
+    }
+    
+    query += ' ORDER BY play_count DESC, rating DESC'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ music: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch music content' }, 500)
+  }
+})
+
+// Get music by ID
+app.get('/api/wellness/music/:id', async (c) => {
+  try {
+    const { DB } = c.env
+    const id = c.req.param('id')
+    const result = await DB.prepare('SELECT * FROM music_content WHERE id = ?').bind(id).first()
+    if (!result) return c.json({ error: 'Music not found' }, 404)
+    return c.json({ music: result })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch music' }, 500)
+  }
+})
+
+// Get all yoga content
+app.get('/api/wellness/yoga', async (c) => {
+  try {
+    const { DB } = c.env
+    const category = c.req.query('category')
+    const difficulty = c.req.query('difficulty')
+    let query = 'SELECT * FROM yoga_content WHERE 1=1'
+    const params: any[] = []
+    
+    if (category) {
+      query += ' AND category = ?'
+      params.push(category)
+    }
+    if (difficulty) {
+      query += ' AND difficulty = ?'
+      params.push(difficulty)
+    }
+    
+    query += ' ORDER BY completion_count DESC, rating DESC'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ yoga: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch yoga content' }, 500)
+  }
+})
+
+// Get yoga by ID
+app.get('/api/wellness/yoga/:id', async (c) => {
+  try {
+    const { DB } = c.env
+    const id = c.req.param('id')
+    const result = await DB.prepare('SELECT * FROM yoga_content WHERE id = ?').bind(id).first()
+    if (!result) return c.json({ error: 'Yoga not found' }, 404)
+    return c.json({ yoga: result })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch yoga' }, 500)
+  }
+})
+
+// Get all breathing routines
+app.get('/api/wellness/breathing', async (c) => {
+  try {
+    const { DB } = c.env
+    const type = c.req.query('type')
+    let query = 'SELECT * FROM breathing_routines WHERE 1=1'
+    const params: any[] = []
+    
+    if (type) {
+      query += ' AND type = ?'
+      params.push(type)
+    }
+    
+    query += ' ORDER BY completion_count DESC, rating DESC'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ breathing: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch breathing routines' }, 500)
+  }
+})
+
+// Get breathing by ID
+app.get('/api/wellness/breathing/:id', async (c) => {
+  try {
+    const { DB } = c.env
+    const id = c.req.param('id')
+    const result = await DB.prepare('SELECT * FROM breathing_routines WHERE id = ?').bind(id).first()
+    if (!result) return c.json({ error: 'Breathing routine not found' }, 404)
+    return c.json({ breathing: result })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch breathing routine' }, 500)
+  }
+})
+
+// Get all ASMR content
+app.get('/api/wellness/asmr', async (c) => {
+  try {
+    const { DB } = c.env
+    const category = c.req.query('category')
+    const binaural = c.req.query('binaural')
+    let query = 'SELECT * FROM asmr_content WHERE 1=1'
+    const params: any[] = []
+    
+    if (category) {
+      query += ' AND category = ?'
+      params.push(category)
+    }
+    if (binaural === 'true') {
+      query += ' AND is_binaural = 1'
+    }
+    
+    query += ' ORDER BY play_count DESC, rating DESC'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ asmr: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch ASMR content' }, 500)
+  }
+})
+
+// Record wellness activity
+app.post('/api/wellness/activity', async (c) => {
+  try {
+    const { DB } = c.env
+    const {
+      user_id = 1,
+      activity_type,
+      content_id,
+      content_title,
+      duration_seconds,
+      completed = false,
+      rating,
+      feedback
+    } = await c.req.json()
+    
+    const result = await DB.prepare(`
+      INSERT INTO wellness_activities (user_id, activity_type, content_id, content_title, duration_seconds, completed, rating, feedback)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(user_id, activity_type, content_id, content_title, duration_seconds, completed ? 1 : 0, rating, feedback).run()
+    
+    return c.json({ success: true, activity_id: result.meta.last_row_id })
+  } catch (error) {
+    return c.json({ error: 'Failed to record activity' }, 500)
+  }
+})
+
+// Get user wellness activities
+app.get('/api/wellness/activities', async (c) => {
+  try {
+    const { DB } = c.env
+    const user_id = c.req.query('user_id') || '1'
+    const activity_type = c.req.query('type')
+    
+    let query = 'SELECT * FROM wellness_activities WHERE user_id = ?'
+    const params: any[] = [user_id]
+    
+    if (activity_type) {
+      query += ' AND activity_type = ?'
+      params.push(activity_type)
+    }
+    
+    query += ' ORDER BY created_at DESC LIMIT 50'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ activities: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch activities' }, 500)
+  }
+})
+
+// Get/Update user wellness preferences
+app.get('/api/wellness/preferences', async (c) => {
+  try {
+    const { DB } = c.env
+    const user_id = c.req.query('user_id') || '1'
+    const result = await DB.prepare(
+      'SELECT * FROM user_wellness_preferences WHERE user_id = ?'
+    ).bind(user_id).first()
+    return c.json({ preferences: result })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch preferences' }, 500)
+  }
+})
+
+app.post('/api/wellness/preferences', async (c) => {
+  try {
+    const { DB } = c.env
+    const {
+      user_id = 1,
+      preferred_music_categories,
+      preferred_yoga_categories,
+      preferred_breathing_types,
+      preferred_asmr_categories,
+      night_mode_enabled = true,
+      auto_recommend_enabled = true,
+      accessibility_mode = false
+    } = await c.req.json()
+    
+    const result = await DB.prepare(`
+      INSERT OR REPLACE INTO user_wellness_preferences 
+      (user_id, preferred_music_categories, preferred_yoga_categories, preferred_breathing_types, 
+       preferred_asmr_categories, night_mode_enabled, auto_recommend_enabled, accessibility_mode, last_updated)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `).bind(
+      user_id,
+      JSON.stringify(preferred_music_categories || []),
+      JSON.stringify(preferred_yoga_categories || []),
+      JSON.stringify(preferred_breathing_types || []),
+      JSON.stringify(preferred_asmr_categories || []),
+      night_mode_enabled ? 1 : 0,
+      auto_recommend_enabled ? 1 : 0,
+      accessibility_mode ? 1 : 0
+    ).run()
+    
+    return c.json({ success: true })
+  } catch (error) {
+    return c.json({ error: 'Failed to save preferences' }, 500)
+  }
+})
+
+// ==================== Caring Mode API ====================
+
+// Get care links for user (as patient or caregiver)
+app.get('/api/care/links', async (c) => {
+  try {
+    const { DB } = c.env
+    const user_id = c.req.query('user_id') || '1'
+    const role = c.req.query('role') || 'all' // 'patient', 'caregiver', 'all'
+    
+    let query = 'SELECT * FROM care_links WHERE status = "active" AND ('
+    const params: any[] = []
+    
+    if (role === 'patient') {
+      query += 'patient_id = ?)'
+      params.push(user_id)
+    } else if (role === 'caregiver') {
+      query += 'caregiver_id = ?)'
+      params.push(user_id)
+    } else {
+      query += 'patient_id = ? OR caregiver_id = ?)'
+      params.push(user_id, user_id)
+    }
+    
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ care_links: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch care links' }, 500)
+  }
+})
+
+// Create QR invite token
+app.post('/api/care/invite', async (c) => {
+  try {
+    const { DB } = c.env
+    const { user_id = 1, permissions } = await c.req.json()
+    
+    // Generate unique token
+    const token = crypto.randomUUID()
+    const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10 minutes
+    
+    const result = await DB.prepare(`
+      INSERT INTO care_invites (patient_id, token, permissions_json, expires_at)
+      VALUES (?, ?, ?, ?)
+    `).bind(user_id, token, JSON.stringify(permissions), expires_at).run()
+    
+    return c.json({ 
+      success: true, 
+      invite_id: result.meta.last_row_id,
+      token,
+      expires_at
+    })
+  } catch (error) {
+    return c.json({ error: 'Failed to create invite' }, 500)
+  }
+})
+
+// Accept care invite (caregiver scans QR)
+app.post('/api/care/accept', async (c) => {
+  try {
+    const { DB } = c.env
+    const { token, caregiver_id = 1, relationship = 'family' } = await c.req.json()
+    
+    // Get invite
+    const invite = await DB.prepare(
+      'SELECT * FROM care_invites WHERE token = ? AND status = "pending"'
+    ).bind(token).first()
+    
+    if (!invite) {
+      return c.json({ error: 'Invalid or expired invite' }, 404)
+    }
+    
+    // Check expiration
+    if (new Date(invite.expires_at) < new Date()) {
+      await DB.prepare('UPDATE care_invites SET status = "expired" WHERE id = ?').bind(invite.id).run()
+      return c.json({ error: 'Invite has expired' }, 400)
+    }
+    
+    // Create care link
+    const linkResult = await DB.prepare(`
+      INSERT INTO care_links (patient_id, caregiver_id, relationship, permissions_json)
+      VALUES (?, ?, ?, ?)
+    `).bind(invite.patient_id, caregiver_id, relationship, invite.permissions_json).run()
+    
+    // Mark invite as used
+    await DB.prepare(`
+      UPDATE care_invites SET status = "used", used_at = CURRENT_TIMESTAMP, used_by_user_id = ? 
+      WHERE id = ?
+    `).bind(caregiver_id, invite.id).run()
+    
+    return c.json({ 
+      success: true, 
+      care_link_id: linkResult.meta.last_row_id
+    })
+  } catch (error) {
+    return c.json({ error: 'Failed to accept invite' }, 500)
+  }
+})
+
+// Get care alerts for caregiver
+app.get('/api/care/alerts', async (c) => {
+  try {
+    const { DB } = c.env
+    const caregiver_id = c.req.query('caregiver_id') || '1'
+    const unread_only = c.req.query('unread_only') === 'true'
+    
+    let query = 'SELECT * FROM care_alerts WHERE caregiver_id = ?'
+    const params: any[] = [caregiver_id]
+    
+    if (unread_only) {
+      query += ' AND read_at IS NULL'
+    }
+    
+    query += ' ORDER BY created_at DESC LIMIT 50'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ alerts: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch alerts' }, 500)
+  }
+})
+
 // ==================== Frontend Routes ====================
 
+// Wellness Hub
+app.get('/wellness', (c) => {
+  return c.redirect('/static/wellness.html')
+})
+
+// Music Player
+app.get('/wellness/music', (c) => {
+  return c.redirect('/static/music.html')
+})
+
 // Assessment page
-app.get('/assessment', async (c) => {
-  const html = await Bun.file('./public/static/assessment.html').text()
-  return c.html(html)
+app.get('/assessment', (c) => {
+  return c.redirect('/static/assessment.html')
 })
 
 // Clinics page
@@ -458,6 +820,7 @@ app.get('/', (c) => {
                     </div>
                     <nav class="hidden md:flex space-x-6">
                         <a href="/" class="hover:opacity-80">홈</a>
+                        <a href="/wellness" class="hover:opacity-80">웰니스</a>
                         <a href="/assessment" class="hover:opacity-80">자가진단</a>
                         <a href="/program" class="hover:opacity-80">프로그램</a>
                         <a href="/clinics" class="hover:opacity-80">병원찾기</a>
@@ -494,7 +857,7 @@ app.get('/', (c) => {
                 <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">
                     세상에 하나뿐인 차별화 기능
                 </h2>
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
                     <!-- Feature 1 -->
                     <div class="bg-blue-50 rounded-xl p-6 card-hover">
                         <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
@@ -517,9 +880,20 @@ app.get('/', (c) => {
                         </p>
                     </div>
 
-                    <!-- Feature 3 -->
-                    <div class="bg-purple-50 rounded-xl p-6 card-hover">
+                    <!-- Feature 3 - NEW Wellness -->
+                    <div class="bg-purple-50 rounded-xl p-6 card-hover cursor-pointer" onclick="window.location.href='/wellness'">
                         <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-spa text-white text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">웰니스 콘텐츠</h3>
+                        <p class="text-gray-600">
+                            음악·요가·호흡·ASMR 힐링 콘텐츠로 수면 보조
+                        </p>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="bg-pink-50 rounded-xl p-6 card-hover">
+                        <div class="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center mb-4">
                             <i class="fas fa-users text-white text-xl"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2 text-gray-800">가족 케어 모드</h3>
@@ -528,7 +902,7 @@ app.get('/', (c) => {
                         </p>
                     </div>
 
-                    <!-- Feature 4 -->
+                    <!-- Feature 5 -->
                     <div class="bg-orange-50 rounded-xl p-6 card-hover">
                         <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-4">
                             <i class="fas fa-hospital text-white text-xl"></i>

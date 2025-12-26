@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>웰니스 허브 - SomniCare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sleep-gradient { background: linear-gradient(135deg, #1f7ed6 0%, #1560a8 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .wellness-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .music-card { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .yoga-card { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .breathing-card { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .asmr-card { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="sleep-gradient text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <i class="fas fa-moon text-2xl"></i>
+                    <div>
+                        <h1 class="text-xl font-bold">SomniCare</h1>
+                        <p class="text-xs opacity-90">웰니스 허브</p>
+                    </div>
+                </a>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-sm hover:opacity-80"><i class="fas fa-home mr-1"></i>홈으로</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="wellness-card text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                <i class="fas fa-spa mr-3"></i>
+                웰니스 & 힐링 콘텐츠
+            </h2>
+            <p class="text-xl mb-8 opacity-90">
+                의료 신뢰감 + 웰니스 감성의 조합 • 불면 치료 보조 콘텐츠
+            </p>
+            <p class="text-sm opacity-80">
+                <i class="fas fa-info-circle mr-1"></i>
+                모든 콘텐츠는 무료로 제공되며, 의료 처방을 대체하지 않습니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Music -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                <div class="music-card p-6 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold">
+                                <i class="fas fa-music mr-2"></i>
+                                수면 음악 플레이어
+                            </h3>
+                            <p class="text-sm opacity-90 mt-1">α파/θ파 기반 안정 음악</p>
+                        </div>
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-music text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-pink-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">세로형 수면 음악, 호흡 동기화 BGM, 백색소음</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-pink-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">타이머 (10/20/30/60분), 자동 페이드아웃</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-pink-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">심야 모드, 클리닉 모드 지원</p>
+                        </div>
+                    </div>
+                    <a href="/wellness/music" class="block w-full bg-gradient-to-r from-pink-500 to-red-500 text-white text-center py-3 rounded-lg font-bold hover:opacity-90 transition">
+                        지금 바로 음악 듣기 →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Yoga -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                <div class="yoga-card p-6 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold">
+                                <i class="fas fa-spa mr-2"></i>
+                                요가 & 스트레칭
+                            </h3>
+                            <p class="text-sm opacity-90 mt-1">취침 전 5분 이완 루틴</p>
+                        </div>
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-spa text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-blue-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">취침 전 이완, 목/어깨 긴장 완화</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-blue-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">기상 직후 몸 깨우기 3분 순환</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-blue-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">텍스트+일러스트 가이드</p>
+                        </div>
+                    </div>
+                    <button class="block w-full bg-gradient-to-r from-blue-400 to-cyan-400 text-white text-center py-3 rounded-lg font-bold hover:opacity-90 transition" onclick="alert('요가 페이지는 곧 오픈됩니다!')">
+                        스트레칭 시작하기 →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Breathing -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                <div class="breathing-card p-6 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold">
+                                <i class="fas fa-wind mr-2"></i>
+                                호흡 안정 루틴
+                            </h3>
+                            <p class="text-sm opacity-90 mt-1">4-7-8 호흡법, 5-5-5 균형 호흡</p>
+                        </div>
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-wind text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">4-7-8 호흡법 (빠른 수면 유도)</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">원형 애니메이션, 색상 흐름 효과</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">2분/5분/10분 루틴 선택</p>
+                        </div>
+                    </div>
+                    <button class="block w-full bg-gradient-to-r from-green-400 to-teal-400 text-white text-center py-3 rounded-lg font-bold hover:opacity-90 transition" onclick="alert('호흡 루틴 페이지는 곧 오픈됩니다!')">
+                        호흡 시작하기 →
+                    </button>
+                </div>
+            </div>
+
+            <!-- ASMR -->
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                <div class="asmr-card p-6 text-white">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold">
+                                <i class="fas fa-volume-up mr-2"></i>
+                                ASMR 사운드룸
+                            </h3>
+                            <p class="text-sm opacity-90 mt-1">힐링 사운드, 심야 모드</p>
+                        </div>
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-volume-up text-3xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-yellow-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">빗소리, 파도, 장작, 숲 속 새소리</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-yellow-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">바이노럴 오디오, 이어폰 최적화</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-yellow-500 mt-1"></i>
+                            <p class="text-gray-700 text-sm">심야 모드 (화면 밝기 최소화)</p>
+                        </div>
+                    </div>
+                    <button class="block w-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-center py-3 rounded-lg font-bold hover:opacity-90 transition" onclick="alert('ASMR 사운드룸은 곧 오픈됩니다!')">
+                        소리 듣기 →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-12 bg-white rounded-2xl shadow-lg p-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+                <i class="fas fa-chart-line text-blue-600 mr-2"></i>
+                웰니스 콘텐츠 현황
+            </h3>
+            <div class="grid md:grid-cols-4 gap-6 text-center" id="stats">
+                <div>
+                    <div class="text-4xl font-bold text-pink-600 mb-2" id="musicCount">-</div>
+                    <div class="text-gray-600">음악 트랙</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-blue-600 mb-2" id="yogaCount">-</div>
+                    <div class="text-gray-600">요가 루틴</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-green-600 mb-2" id="breathingCount">-</div>
+                    <div class="text-gray-600">호흡 루틴</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-yellow-600 mb-2" id="asmrCount">-</div>
+                    <div class="text-gray-600">ASMR 사운드</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notice -->
+        <div class="mt-8 bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-info-circle text-blue-600 text-xl mt-1"></i>
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-2">공공 사업용 안전 안내</h4>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• 모든 콘텐츠는 무료로 제공됩니다</li>
+                        <li>• 이 콘텐츠는 의료 처방을 대체하지 않습니다</li>
+                        <li>• 중증 불면증 증상 시 전문의 상담을 권장합니다</li>
+                        <li>• 병원/지자체 제출 시 과장 없이 사용 가능합니다</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        // Load stats
+        async function loadStats() {
+            try {
+                const [music, yoga, breathing, asmr] = await Promise.all([
+                    axios.get('/api/wellness/music'),
+                    axios.get('/api/wellness/yoga'),
+                    axios.get('/api/wellness/breathing'),
+                    axios.get('/api/wellness/asmr')
+                ]);
+                
+                document.getElementById('musicCount').textContent = music.data.music.length;
+                document.getElementById('yogaCount').textContent = yoga.data.yoga.length;
+                document.getElementById('breathingCount').textContent = breathing.data.breathing.length;
+                document.getElementById('asmrCount').textContent = asmr.data.asmr.length;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+        
+        // Initialize
+        loadStats();
+    </script>
+</body>
+</html>

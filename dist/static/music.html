@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>수면 음악 플레이어 - SomniCare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sleep-gradient { background: linear-gradient(135deg, #1f7ed6 0%, #1560a8 100%); }
+        .night-mode { background: #0a0e27; filter: brightness(0.7); }
+        .night-mode * { color: #aaa !important; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .player-active { border: 3px solid #3b82f6; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-animation { animation: fadeIn 2s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50" id="mainBody">
+    <!-- Header -->
+    <header class="sleep-gradient text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <i class="fas fa-moon text-2xl"></i>
+                    <div>
+                        <h1 class="text-xl font-bold">SomniCare</h1>
+                        <p class="text-xs opacity-90">수면 음악 플레이어</p>
+                    </div>
+                </a>
+                <div class="flex items-center space-x-4">
+                    <button id="nightModeToggle" class="px-3 py-1 bg-gray-800 rounded-lg hover:bg-gray-700 text-sm">
+                        <i class="fas fa-moon mr-1"></i>심야 모드
+                    </button>
+                    <a href="/wellness" class="text-sm hover:opacity-80"><i class="fas fa-home mr-1"></i>웰니스 홈</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">
+            <i class="fas fa-music text-blue-600 mr-2"></i>
+            수면 유도 음악
+        </h2>
+
+        <!-- Filter -->
+        <div class="mb-6 flex gap-2 overflow-x-auto">
+            <button class="filter-btn px-4 py-2 bg-blue-600 text-white rounded-lg" data-category="all">전체</button>
+            <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300" data-category="alpha_wave">α파 음악</button>
+            <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300" data-category="theta_wave">θ파 음악</button>
+            <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300" data-category="breathing_sync">호흡 동기화</button>
+            <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300" data-category="white_noise">백색소음</button>
+            <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300" data-category="rain">빗소리</button>
+            <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300" data-category="nature">자연음</button>
+        </div>
+
+        <!-- Music Player -->
+        <div class="bg-white rounded-xl p-6 shadow-lg mb-8" id="playerContainer" style="display: none;">
+            <div class="flex items-center gap-6">
+                <div class="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-music text-white text-4xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800" id="currentTitle">음원을 선택하세요</h3>
+                    <p class="text-gray-600 mt-1" id="currentDescription">아래에서 원하는 음악을 클릭하세요</p>
+                    
+                    <!-- Controls -->
+                    <div class="flex items-center gap-4 mt-4">
+                        <button id="playPauseBtn" class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700" disabled>
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button id="stopBtn" class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-400" disabled>
+                            <i class="fas fa-stop"></i>
+                        </button>
+                        
+                        <!-- Timer -->
+                        <div class="flex gap-2 ml-4">
+                            <button class="timer-btn px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm" data-minutes="10">10분</button>
+                            <button class="timer-btn px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm" data-minutes="20">20분</button>
+                            <button class="timer-btn px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm" data-minutes="30">30분</button>
+                            <button class="timer-btn px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm" data-minutes="60">60분</button>
+                            <button id="timerCancelBtn" class="px-3 py-1 bg-red-200 text-red-700 rounded-lg hover:bg-red-300 text-sm" style="display: none;">타이머 취소</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Timer Status -->
+                    <div id="timerStatus" class="mt-3 text-sm text-gray-600" style="display: none;">
+                        <i class="fas fa-clock mr-1"></i>
+                        <span id="timerText"></span>
+                    </div>
+                    
+                    <!-- Volume -->
+                    <div class="flex items-center gap-3 mt-4">
+                        <i class="fas fa-volume-up text-gray-600"></i>
+                        <input type="range" id="volumeControl" min="0" max="100" value="70" class="flex-1">
+                        <span id="volumeValue" class="text-sm text-gray-600">70%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden audio element -->
+            <audio id="audioPlayer"></audio>
+        </div>
+
+        <!-- Music List -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="musicList">
+            <!-- Music items will be loaded here -->
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
+            <p class="text-gray-600 mt-4">음악 목록을 불러오는 중...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12" style="display: none;">
+            <i class="fas fa-music text-gray-400 text-6xl"></i>
+            <p class="text-gray-600 mt-4">해당 카테고리에 음악이 없습니다</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        let currentMusic = null;
+        let isPlaying = false;
+        let timerInterval = null;
+        let fadeInterval = null;
+        let timerEndTime = null;
+        const audio = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeControl = document.getElementById('volumeControl');
+        const volumeValue = document.getElementById('volumeValue');
+        const nightModeToggle = document.getElementById('nightModeToggle');
+        const mainBody = document.getElementById('mainBody');
+
+        // Night mode toggle
+        nightModeToggle.addEventListener('click', () => {
+            mainBody.classList.toggle('night-mode');
+            const isNightMode = mainBody.classList.contains('night-mode');
+            nightModeToggle.innerHTML = isNightMode 
+                ? '<i class="fas fa-sun mr-1"></i>일반 모드'
+                : '<i class="fas fa-moon mr-1"></i>심야 모드';
+        });
+
+        // Volume control
+        volumeControl.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            audio.volume = volume / 100;
+            volumeValue.textContent = volume + '%';
+        });
+
+        // Load music list
+        async function loadMusic(category = 'all') {
+            try {
+                const url = category === 'all' 
+                    ? '/api/wellness/music' 
+                    : `/api/wellness/music?category=${category}`;
+                const response = await axios.get(url);
+                const musicList = response.data.music;
+                
+                displayMusic(musicList);
+            } catch (error) {
+                console.error('Failed to load music:', error);
+                document.getElementById('loading').innerHTML = 
+                    '<p class="text-red-600">음악 목록을 불러오지 못했습니다. 나중에 다시 시도해주세요.</p>';
+            }
+        }
+
+        // Display music
+        function displayMusic(musicList) {
+            const container = document.getElementById('musicList');
+            const loading = document.getElementById('loading');
+            const emptyState = document.getElementById('emptyState');
+            
+            loading.style.display = 'none';
+            
+            if (!musicList || musicList.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            container.style.display = 'grid';
+            
+            container.innerHTML = musicList.map(music => {
+                const durationMin = Math.floor(music.duration_seconds / 60);
+                const categoryLabel = getCategoryLabel(music.category);
+                
+                return `
+                    <div class="bg-white rounded-xl p-6 shadow-md card-hover cursor-pointer" onclick="selectMusic(${music.id})">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">${music.title}</h3>
+                                <p class="text-sm text-blue-600 mt-1">
+                                    <i class="fas fa-tag mr-1"></i>${categoryLabel}
+                                </p>
+                            </div>
+                            ${music.is_premium ? 
+                                '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded">Premium</span>' 
+                                : ''}
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">${music.description}</p>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span><i class="fas fa-clock mr-1"></i>${durationMin}분</span>
+                            <span><i class="fas fa-star text-yellow-500 mr-1"></i>${music.rating.toFixed(1)}</span>
+                            <span><i class="fas fa-play mr-1"></i>${music.play_count.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Select music
+        async function selectMusic(id) {
+            try {
+                const response = await axios.get(`/api/wellness/music/${id}`);
+                currentMusic = response.data.music;
+                
+                document.getElementById('currentTitle').textContent = currentMusic.title;
+                document.getElementById('currentDescription').textContent = currentMusic.description;
+                document.getElementById('playerContainer').style.display = 'block';
+                
+                // In real app, load audio URL
+                // audio.src = currentMusic.audio_url;
+                playPauseBtn.disabled = false;
+                stopBtn.disabled = false;
+                
+                console.log('Selected music:', currentMusic);
+            } catch (error) {
+                console.error('Failed to load music:', error);
+                alert('음악을 불러올 수 없습니다.');
+            }
+        }
+
+        // Play/Pause
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                isPlaying = false;
+            } else {
+                audio.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                isPlaying = true;
+            }
+        });
+
+        // Stop
+        stopBtn.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            isPlaying = false;
+            cancelTimer();
+        });
+
+        // Timer buttons
+        document.querySelectorAll('.timer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const minutes = parseInt(btn.dataset.minutes);
+                setTimer(minutes);
+            });
+        });
+
+        // Set timer
+        function setTimer(minutes) {
+            cancelTimer();
+            
+            timerEndTime = Date.now() + minutes * 60 * 1000;
+            document.getElementById('timerStatus').style.display = 'block';
+            document.getElementById('timerCancelBtn').style.display = 'inline-block';
+            
+            timerInterval = setInterval(() => {
+                const remaining = timerEndTime - Date.now();
+                
+                if (remaining <= 0) {
+                    startFadeOut();
+                    return;
+                }
+                
+                const mins = Math.floor(remaining / 60000);
+                const secs = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('timerText').textContent = 
+                    `${mins}분 ${secs}초 후 자동 종료 (페이드아웃)`;
+            }, 1000);
+        }
+
+        // Start fade out
+        function startFadeOut() {
+            clearInterval(timerInterval);
+            document.getElementById('timerText').textContent = '페이드아웃 중...';
+            
+            const startVolume = audio.volume;
+            const fadeSteps = 30;
+            const fadeInterval = 1000;
+            let currentStep = 0;
+            
+            fadeInterval = setInterval(() => {
+                currentStep++;
+                audio.volume = startVolume * (1 - currentStep / fadeSteps);
+                
+                if (currentStep >= fadeSteps) {
+                    clearInterval(fadeInterval);
+                    stopBtn.click();
+                    document.getElementById('timerStatus').style.display = 'none';
+                    document.getElementById('timerCancelBtn').style.display = 'none';
+                }
+            }, fadeInterval);
+        }
+
+        // Cancel timer
+        function cancelTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            if (fadeInterval) {
+                clearInterval(fadeInterval);
+                fadeInterval = null;
+            }
+            document.getElementById('timerStatus').style.display = 'none';
+            document.getElementById('timerCancelBtn').style.display = 'none';
+        }
+
+        document.getElementById('timerCancelBtn').addEventListener('click', cancelTimer);
+
+        // Category filter
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                btn.classList.add('bg-blue-600', 'text-white');
+                btn.classList.remove('bg-gray-200', 'text-gray-700');
+                
+                const category = btn.dataset.category;
+                loadMusic(category === 'all' ? 'all' : category);
+            });
+        });
+
+        // Helper function
+        function getCategoryLabel(category) {
+            const labels = {
+                alpha_wave: 'α파 음악',
+                theta_wave: 'θ파 음악',
+                breathing_sync: '호흡 동기화',
+                white_noise: '백색소음',
+                rain: '빗소리',
+                fire: '난로',
+                nature: '자연음'
+            };
+            return labels[category] || category;
+        }
+
+        // Initialize
+        loadMusic();
+    </script>
+</body>
+</html>
