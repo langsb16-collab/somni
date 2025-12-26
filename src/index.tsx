@@ -1228,6 +1228,9 @@ app.get('/', (c) => {
         </style>
     </head>
     <body class="bg-gray-50">
+        <!-- Load Translations -->
+        <script src="/static/translations.js"></script>
+        
         <!-- Header -->
         <header class="sleep-gradient text-white shadow-lg">
             <div class="max-w-7xl mx-auto px-3 py-2 md:py-3">
@@ -1235,28 +1238,35 @@ app.get('/', (c) => {
                     <div class="flex items-center space-x-2">
                         <i class="fas fa-moon text-lg md:text-xl"></i>
                         <div>
-                            <h1 class="text-base md:text-lg font-bold">SomniCare</h1>
-                            <p class="text-xs opacity-90 hidden sm:block">불면증 치료·케어 플랫폼</p>
+                            <h1 class="text-base md:text-lg font-bold" id="siteName">SomniCare</h1>
+                            <p class="text-xs opacity-90 hidden sm:block" id="siteTagline">불면증 치료·케어 플랫폼</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 md:gap-4">
                         <nav class="hidden md:flex space-x-4 text-sm">
-                            <a href="/" class="hover:opacity-80">홈</a>
-                            <a href="/wellness" class="hover:opacity-80">웰니스</a>
-                            <a href="/assessment" class="hover:opacity-80">자가진단</a>
-                            <a href="/program" class="hover:opacity-80">프로그램</a>
-                            <a href="/clinics" class="hover:opacity-80">병원찾기</a>
+                            <a href="/" class="hover:opacity-80" id="menuHome">홈</a>
+                            <a href="/wellness" class="hover:opacity-80" id="menuWellness">웰니스</a>
+                            <a href="/assessment" class="hover:opacity-80" id="menuAssessment">자가진단</a>
+                            <a href="/program" class="hover:opacity-80" id="menuProgram">프로그램</a>
+                            <a href="/clinics" class="hover:opacity-80" id="menuClinics">병원찾기</a>
                         </nav>
                         <div class="lang-dropdown">
                             <button class="px-2 py-1 bg-white bg-opacity-20 rounded-lg text-xs md:text-sm font-semibold hover:bg-opacity-30 transition flex items-center gap-1">
                                 <i class="fas fa-globe"></i>
-                                <span class="hidden sm:inline">한국어</span>
+                                <span class="hidden sm:inline" id="currentLangText">한국어</span>
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </button>
                             <div class="lang-dropdown-content">
-                                <button class="active" onclick="alert('한국어가 선택되었습니다')">🇰🇷 한국어</button>
-                                <button onclick="alert('English - Coming soon!')">🇺🇸 English</button>
-                                <button onclick="alert('中文 - 即将推出!')">🇨🇳 中文</button>
+                                <button onclick="setLanguage('ko')">🇰🇷 한국어</button>
+                                <button onclick="setLanguage('en')">🇺🇸 English</button>
+                                <button onclick="setLanguage('zh')">🇨🇳 中文</button>
+                                <button onclick="setLanguage('ja')">🇯🇵 日本語</button>
+                                <button onclick="setLanguage('es')">🇪🇸 Español</button>
+                                <button onclick="setLanguage('fr')">🇫🇷 Français</button>
+                                <button onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+                                <button onclick="setLanguage('vi')">🇻🇳 Tiếng Việt</button>
+                                <button onclick="setLanguage('th')">🇹🇭 ไทย</button>
+                                <button onclick="setLanguage('id')">🇮🇩 Bahasa Indonesia</button>
                             </div>
                         </div>
                     </div>
@@ -1267,20 +1277,20 @@ app.get('/', (c) => {
         <!-- Hero Section -->
         <section class="sleep-gradient text-white py-5 md:py-10">
             <div class="max-w-7xl mx-auto px-3 text-center">
-                <h2 class="text-lg md:text-3xl font-bold mb-2 leading-tight">
+                <h2 class="text-lg md:text-3xl font-bold mb-2 leading-tight" id="heroTitle">
                     당신의 잠은 치료 받을 수 있습니다
                 </h2>
-                <p class="text-xs md:text-base mb-4 opacity-90 leading-tight">
+                <p class="text-xs md:text-base mb-4 opacity-90 leading-tight" id="heroSubtitle">
                     과학적 맞춤 수면루틴 + 가족/보호자 케어 + 병원 연계까지
                 </p>
                 <div class="flex flex-col sm:flex-row gap-2 md:gap-3 justify-center">
                     <a href="/assessment" class="bg-white text-blue-600 px-4 md:px-6 py-2 md:py-2.5 rounded-lg font-bold text-xs md:text-sm hover:bg-gray-100 transition">
                         <i class="fas fa-clipboard-check mr-1"></i>
-                        무료 불면증 검사
+                        <span id="btnFreeTest">무료 불면증 검사</span>
                     </a>
                     <a href="/program" class="bg-blue-800 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-lg font-bold text-xs md:text-sm hover:bg-blue-900 transition border-2 border-white">
                         <i class="fas fa-book-medical mr-1"></i>
-                        프로그램 보기
+                        <span id="btnViewProgram">프로그램 보기</span>
                     </a>
                 </div>
             </div>
@@ -1289,7 +1299,7 @@ app.get('/', (c) => {
         <!-- Features Section -->
         <section class="py-8 md:py-12 bg-white">
             <div class="max-w-7xl mx-auto px-3">
-                <h2 class="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 text-gray-800">
+                <h2 class="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 text-gray-800" id="featuresTitle">
                     세상에 하나뿐인 차별화 기능
                 </h2>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
@@ -1298,8 +1308,8 @@ app.get('/', (c) => {
                         <div class="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-lg flex items-center justify-center mb-2">
                             <i class="fas fa-chart-line text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">리스크 스코어</h3>
-                        <p class="text-xs text-gray-600 text-truncate-2">
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800" id="featureRiskScore">리스크 스코어</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2" id="featureRiskDesc">
                             폰 센서+생활 데이터로 불면 위험도 분석
                         </p>
                     </div>
@@ -1309,8 +1319,8 @@ app.get('/', (c) => {
                         <div class="w-8 h-8 md:w-10 md:h-10 bg-green-600 rounded-lg flex items-center justify-center mb-2">
                             <i class="fas fa-brain text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">AI 맞춤 CBT-I</h3>
-                        <p class="text-xs text-gray-600 text-truncate-2">
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800" id="featureAI">AI 맞춤 CBT-I</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2" id="featureAIDesc">
                             개인별 매일 업데이트 인지행동치료
                         </p>
                     </div>
@@ -1320,8 +1330,8 @@ app.get('/', (c) => {
                         <div class="w-8 h-8 md:w-10 md:h-10 bg-purple-600 rounded-lg flex items-center justify-center mb-2">
                             <i class="fas fa-spa text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">웰니스 콘텐츠</h3>
-                        <p class="text-xs text-gray-600 text-truncate-2">
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800" id="featureWellness">웰니스 콘텐츠</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2" id="featureWellnessDesc">
                             음악·요가·호흡·ASMR 힐링 콘텐츠
                         </p>
                     </div>
@@ -1331,8 +1341,8 @@ app.get('/', (c) => {
                         <div class="w-8 h-8 md:w-10 md:h-10 bg-pink-600 rounded-lg flex items-center justify-center mb-2">
                             <i class="fas fa-users text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">가족 케어 모드</h3>
-                        <p class="text-xs text-gray-600 text-truncate-2">
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800" id="featureCare">가족 케어 모드</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2" id="featureCareDesc">
                             야간 감지+보호자 실시간 연동
                         </p>
                     </div>
@@ -1342,8 +1352,8 @@ app.get('/', (c) => {
                         <div class="w-8 h-8 md:w-10 md:h-10 bg-orange-600 rounded-lg flex items-center justify-center mb-2">
                             <i class="fas fa-hospital text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">병원 연계</h3>
-                        <p class="text-xs text-gray-600 text-truncate-2">
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800" id="featureHospital">병원 연계</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2" id="featureHospitalDesc">
                             전국 수면클리닉+수면다원검사 병원
                         </p>
                     </div>
@@ -1354,7 +1364,7 @@ app.get('/', (c) => {
         <!-- Quick Actions -->
         <section class="py-16 bg-gray-100">
             <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800" id="quickTitle">
                     빠른 시작하기
                 </h2>
                 <div class="grid md:grid-cols-3 gap-6">
@@ -1364,9 +1374,9 @@ app.get('/', (c) => {
                             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <i class="fas fa-file-medical text-blue-600 text-2xl"></i>
                             </div>
-                            <h3 class="text-xl font-bold mb-2">불면증 자가진단 (ISI)</h3>
-                            <p class="text-gray-600 mb-6">3분이면 완료되는 과학적 검사</p>
-                            <a href="/assessment?type=isi" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition">
+                            <h3 class="text-xl font-bold mb-2" id="quickISI">불면증 자가진단 (ISI)</h3>
+                            <p class="text-gray-600 mb-6" id="quickISIDesc">3분이면 완료되는 과학적 검사</p>
+                            <a href="/assessment?type=isi" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition" id="quickISIBtn">
                                 검사 시작 →
                             </a>
                         </div>
@@ -1378,9 +1388,9 @@ app.get('/', (c) => {
                             <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <i class="fas fa-bed text-green-600 text-2xl"></i>
                             </div>
-                            <h3 class="text-xl font-bold mb-2">수면일지 작성</h3>
-                            <p class="text-gray-600 mb-6">어제 밤 수면 상태 기록하기</p>
-                            <a href="/sleep-log" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition">
+                            <h3 class="text-xl font-bold mb-2" id="quickLog">수면일지 작성</h3>
+                            <p class="text-gray-600 mb-6" id="quickLogDesc">어제 밤 수면 상태 기록하기</p>
+                            <a href="/sleep-log" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition" id="quickLogBtn">
                                 일지 쓰기 →
                             </a>
                         </div>
@@ -1392,9 +1402,9 @@ app.get('/', (c) => {
                             <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <i class="fas fa-map-marked-alt text-orange-600 text-2xl"></i>
                             </div>
-                            <h3 class="text-xl font-bold mb-2">병원 찾기</h3>
-                            <p class="text-gray-600 mb-6">가까운 수면클리닉 검색</p>
-                            <a href="/clinics" class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700 transition">
+                            <h3 class="text-xl font-bold mb-2" id="quickClinic">병원 찾기</h3>
+                            <p class="text-gray-600 mb-6" id="quickClinicDesc">가까운 수면클리닉 검색</p>
+                            <a href="/clinics" class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700 transition" id="quickClinicBtn">
                                 병원 찾기 →
                             </a>
                         </div>
@@ -1432,25 +1442,25 @@ app.get('/', (c) => {
             <div class="max-w-7xl mx-auto px-4">
                 <div class="grid md:grid-cols-4 gap-8">
                     <div>
-                        <h3 class="text-xl font-bold mb-4">SomniCare</h3>
-                        <p class="text-gray-400">
+                        <h3 class="text-xl font-bold mb-4" id="siteName">SomniCare</h3>
+                        <p class="text-gray-400" id="siteTagline">
                             불면증 치료·케어 종합 관리 플랫폼
                         </p>
                     </div>
                     <div>
                         <h3 class="font-bold mb-4">서비스</h3>
                         <ul class="space-y-2 text-gray-400">
-                            <li><a href="/assessment" class="hover:text-white">자가진단</a></li>
-                            <li><a href="/program" class="hover:text-white">CBT-I 프로그램</a></li>
-                            <li><a href="/clinics" class="hover:text-white">병원 찾기</a></li>
+                            <li><a href="/assessment" class="hover:text-white" id="menuAssessment">자가진단</a></li>
+                            <li><a href="/program" class="hover:text-white" id="menuProgram">CBT-I 프로그램</a></li>
+                            <li><a href="/clinics" class="hover:text-white" id="menuClinics">병원 찾기</a></li>
                         </ul>
                     </div>
                     <div>
                         <h3 class="font-bold mb-4">정보</h3>
                         <ul class="space-y-2 text-gray-400">
-                            <li><a href="/about" class="hover:text-white">소개</a></li>
-                            <li><a href="/privacy" class="hover:text-white">개인정보처리방침</a></li>
-                            <li><a href="/terms" class="hover:text-white">이용약관</a></li>
+                            <li><a href="/about" class="hover:text-white" id="footerAbout">소개</a></li>
+                            <li><a href="/privacy" class="hover:text-white" id="footerPrivacy">개인정보처리방침</a></li>
+                            <li><a href="/terms" class="hover:text-white" id="footerTerms">이용약관</a></li>
                         </ul>
                     </div>
                     <div>
@@ -1463,7 +1473,7 @@ app.get('/', (c) => {
                     </div>
                 </div>
                 <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                    <p>&copy; 2025 SomniCare. All rights reserved.</p>
+                    <p id="footerCopyright">&copy; 2025 SomniCare. All rights reserved.</p>
                 </div>
             </div>
         </footer>
@@ -1490,10 +1500,93 @@ app.get('/', (c) => {
             }
           }
           
-          // Initialize
+          // Apply translations
+          function applyTranslations() {
+            // Helper function to translate element by ID
+            const translate = (id, key) => {
+              const el = document.getElementById(id);
+              if (el) el.textContent = t(key);
+            };
+            
+            // Header
+            translate('siteName', 'siteName');
+            translate('siteTagline', 'siteTagline');
+            translate('menuHome', 'menuHome');
+            translate('menuWellness', 'menuWellness');
+            translate('menuAssessment', 'menuAssessment');
+            translate('menuProgram', 'menuProgram');
+            translate('menuClinics', 'menuClinics');
+            
+            // Hero Section
+            translate('heroTitle', 'heroTitle');
+            translate('heroSubtitle', 'heroSubtitle');
+            translate('btnFreeTest', 'btnFreeTest');
+            translate('btnViewProgram', 'btnViewProgram');
+            
+            // Features Section
+            translate('featuresTitle', 'featuresTitle');
+            translate('featureRiskScore', 'featureRiskScore');
+            translate('featureRiskDesc', 'featureRiskDesc');
+            translate('featureAI', 'featureAI');
+            translate('featureAIDesc', 'featureAIDesc');
+            translate('featureWellness', 'featureWellness');
+            translate('featureWellnessDesc', 'featureWellnessDesc');
+            translate('featureCare', 'featureCare');
+            translate('featureCareDesc', 'featureCareDesc');
+            translate('featureHospital', 'featureHospital');
+            translate('featureHospitalDesc', 'featureHospitalDesc');
+            
+            // Quick Actions
+            translate('quickTitle', 'quickTitle');
+            translate('quickISI', 'quickISI');
+            translate('quickISIDesc', 'quickISIDesc');
+            translate('quickISIBtn', 'quickISIBtn');
+            translate('quickLog', 'quickLog');
+            translate('quickLogDesc', 'quickLogDesc');
+            translate('quickLogBtn', 'quickLogBtn');
+            translate('quickClinic', 'quickClinic');
+            translate('quickClinicDesc', 'quickClinicDesc');
+            translate('quickClinicBtn', 'quickClinicBtn');
+            
+            // Footer
+            translate('footerAbout', 'footerAbout');
+            translate('footerPrivacy', 'footerPrivacy');
+            translate('footerTerms', 'footerTerms');
+            translate('footerCopyright', 'footerCopyright');
+            
+            // Update current language display
+            const langNames = {
+              'ko': '한국어',
+              'en': 'English',
+              'zh': '中文',
+              'ja': '日本語',
+              'es': 'Español',
+              'fr': 'Français',
+              'de': 'Deutsch',
+              'vi': 'Tiếng Việt',
+              'th': 'ไทย',
+              'id': 'Bahasa Indonesia'
+            };
+            const currentLang = getCurrentLanguage();
+            const el_currentLangText = document.getElementById('currentLangText');
+            if (el_currentLangText) el_currentLangText.textContent = langNames[currentLang] || '한국어';
+            
+            // Highlight active language in dropdown
+            document.querySelectorAll('.lang-dropdown-content button').forEach(btn => {
+              btn.classList.remove('active');
+            });
+            const langButtons = document.querySelectorAll('.lang-dropdown-content button');
+            const langMap = { 'ko': 0, 'en': 1, 'zh': 2, 'ja': 3, 'es': 4, 'fr': 5, 'de': 6, 'vi': 7, 'th': 8, 'id': 9 };
+            if (langButtons[langMap[currentLang]]) {
+              langButtons[langMap[currentLang]].classList.add('active');
+            }
+          }
+          
+          // Initialize on page load
           document.addEventListener('DOMContentLoaded', () => {
             checkHealth();
             loadDashboard();
+            applyTranslations();
           });
         </script>
     </body>
