@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>호흡 안정 루틴 - SomniCare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sleep-gradient { background: linear-gradient(135deg, #1f7ed6 0%, #1560a8 100%); }
+        .breathing-gradient { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        
+        .breathing-circle {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-center;
+            box-shadow: 0 0 40px rgba(67, 233, 123, 0.4);
+            transition: all 0.5s ease;
+        }
+        
+        .breathing-circle.inhale {
+            transform: scale(1.3);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 0 60px rgba(102, 126, 234, 0.6);
+        }
+        
+        .breathing-circle.hold {
+            transform: scale(1.3);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 0 60px rgba(240, 147, 251, 0.6);
+        }
+        
+        .breathing-circle.exhale {
+            transform: scale(1);
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            box-shadow: 0 0 40px rgba(67, 233, 123, 0.4);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="sleep-gradient text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/wellness" class="flex items-center space-x-3">
+                    <i class="fas fa-wind text-2xl"></i>
+                    <div>
+                        <h1 class="text-xl font-bold">호흡 안정 루틴</h1>
+                        <p class="text-xs opacity-90">SomniCare 웰니스</p>
+                    </div>
+                </a>
+                <div class="flex items-center space-x-4">
+                    <a href="/wellness" class="text-sm hover:opacity-80"><i class="fas fa-arrow-left mr-1"></i>웰니스 허브</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="breathing-gradient text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3">
+                <i class="fas fa-wind mr-2"></i>
+                호흡 안정 & 마음 이완
+            </h2>
+            <p class="text-lg mb-2 opacity-90">
+                과학 기반 호흡법으로 심박수와 긴장도를 낮춰 숙면 준비
+            </p>
+            <p class="text-sm opacity-80">
+                <i class="fas fa-info-circle mr-1"></i>
+                편안한 자세에서 천천히 따라해보세요
+            </p>
+        </div>
+    </section>
+
+    <!-- Breathing Routines Selection -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12" id="routinesList">
+            <!-- Loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Breathing Exercise Screen -->
+    <div id="exerciseScreen" class="hidden fixed inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-8 h-full flex flex-col items-center justify-center">
+            <!-- Exit Button -->
+            <button id="exitExercise" class="absolute top-4 right-4 text-white text-3xl hover:opacity-80 transition">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <!-- Exercise Title -->
+            <h2 id="exerciseTitle" class="text-3xl font-bold text-white mb-8 text-center"></h2>
+            
+            <!-- Breathing Circle -->
+            <div class="breathing-circle bg-gradient-to-br from-green-400 to-teal-400 mb-8">
+                <div class="text-center text-white">
+                    <div id="phaseText" class="text-4xl font-bold mb-2">준비</div>
+                    <div id="countdownText" class="text-6xl font-bold">-</div>
+                </div>
+            </div>
+            
+            <!-- Instructions -->
+            <p id="instructionText" class="text-xl text-white text-center mb-8 opacity-90">
+                편안한 자세로 앉거나 누워주세요
+            </p>
+            
+            <!-- Progress -->
+            <div class="w-full max-w-md mb-8">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-semibold text-white">진행 상황</span>
+                    <span id="cycleProgress" class="text-sm font-semibold text-white">0 / 0 사이클</span>
+                </div>
+                <div class="h-2 bg-white bg-opacity-20 rounded-full overflow-hidden">
+                    <div id="progressBar" class="h-full bg-white transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="flex gap-4">
+                <button id="pauseResume" class="bg-white text-purple-900 px-8 py-3 rounded-full font-bold text-lg hover:bg-opacity-90 transition">
+                    <i class="fas fa-pause mr-2"></i>일시정지
+                </button>
+                <button id="stopExercise" class="bg-red-500 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-red-600 transition">
+                    <i class="fas fa-stop mr-2"></i>중단
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        let routinesData = [];
+        let currentRoutine = null;
+        let currentCycle = 0;
+        let totalCycles = 0;
+        let currentPhase = 'ready'; // ready, inhale, hold, exhale, rest
+        let phaseTimer = null;
+        let isPaused = false;
+
+        // Load breathing routines
+        async function loadRoutines() {
+            try {
+                const response = await axios.get('/api/wellness/breathing');
+                routinesData = response.data.breathing || [];
+                displayRoutines(routinesData);
+            } catch (error) {
+                console.error('Failed to load breathing routines:', error);
+            }
+        }
+
+        // Display routines
+        function displayRoutines(routines) {
+            const list = document.getElementById('routinesList');
+            list.innerHTML = routines.map(routine => `
+                <div class="bg-white rounded-xl p-6 card-hover cursor-pointer" onclick="selectRoutine(${routine.id})">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-teal-400 rounded-full flex items-center justify-center">
+                            <i class="fas fa-wind text-white text-xl"></i>
+                        </div>
+                        <span class="text-yellow-500">
+                            <i class="fas fa-star"></i>
+                            <span class="text-sm font-semibold">${routine.rating}</span>
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">${routine.title}</h3>
+                    <p class="text-sm text-gray-600 mb-4">${routine.description}</p>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-green-500"></i>
+                            <span>${Math.floor(routine.duration_seconds / 60)}분 ${routine.duration_seconds % 60}초</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-sync text-blue-500"></i>
+                            <span>${routine.cycles}회 반복</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        ${JSON.parse(routine.benefits || '[]').map(benefit => `
+                            <span class="px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs">
+                                ${benefit}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Select routine
+        window.selectRoutine = function(id) {
+            const routine = routinesData.find(r => r.id === id);
+            if (!routine) return;
+            
+            currentRoutine = routine;
+            currentCycle = 0;
+            totalCycles = routine.cycles;
+            currentPhase = 'ready';
+            isPaused = false;
+            
+            // Show exercise screen
+            document.getElementById('exerciseScreen').classList.remove('hidden');
+            document.getElementById('exerciseTitle').textContent = routine.title;
+            document.getElementById('cycleProgress').textContent = `0 / ${totalCycles} 사이클`;
+            
+            // Start countdown
+            setTimeout(() => startExercise(), 2000);
+        };
+
+        // Start exercise
+        function startExercise() {
+            if (!currentRoutine) return;
+            currentCycle = 0;
+            nextCycle();
+        }
+
+        // Next cycle
+        function nextCycle() {
+            if (currentCycle >= totalCycles) {
+                completeExercise();
+                return;
+            }
+            
+            currentCycle++;
+            document.getElementById('cycleProgress').textContent = `${currentCycle} / ${totalCycles} 사이클`;
+            updateProgress();
+            
+            // Start breathing phases
+            runPhase('inhale');
+        }
+
+        // Run phase
+        function runPhase(phase) {
+            if (isPaused) return;
+            
+            currentPhase = phase;
+            const circle = document.querySelector('.breathing-circle');
+            circle.className = `breathing-circle ${phase}`;
+            
+            let duration = 0;
+            let phaseText = '';
+            let instruction = '';
+            
+            switch(phase) {
+                case 'inhale':
+                    duration = currentRoutine.inhale_seconds;
+                    phaseText = '들이마시기';
+                    instruction = '코로 천천히 깊게 숨을 들이마시세요';
+                    break;
+                case 'hold':
+                    duration = currentRoutine.hold_seconds;
+                    phaseText = '숨 멈추기';
+                    instruction = '편안하게 숨을 멈추세요';
+                    break;
+                case 'exhale':
+                    duration = currentRoutine.exhale_seconds;
+                    phaseText = '내쉬기';
+                    instruction = '입으로 천천히 숨을 내쉬세요';
+                    break;
+            }
+            
+            document.getElementById('phaseText').textContent = phaseText;
+            document.getElementById('instructionText').textContent = instruction;
+            
+            // Countdown
+            let remaining = duration;
+            document.getElementById('countdownText').textContent = remaining;
+            
+            phaseTimer = setInterval(() => {
+                if (isPaused) return;
+                
+                remaining--;
+                document.getElementById('countdownText').textContent = remaining;
+                
+                if (remaining <= 0) {
+                    clearInterval(phaseTimer);
+                    
+                    // Move to next phase
+                    if (phase === 'inhale') {
+                        runPhase('hold');
+                    } else if (phase === 'hold') {
+                        runPhase('exhale');
+                    } else if (phase === 'exhale') {
+                        // Cycle complete
+                        setTimeout(() => nextCycle(), 1000);
+                    }
+                }
+            }, 1000);
+        }
+
+        // Update progress
+        function updateProgress() {
+            const progress = (currentCycle / totalCycles) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // Complete exercise
+        function completeExercise() {
+            clearInterval(phaseTimer);
+            
+            const circle = document.querySelector('.breathing-circle');
+            circle.className = 'breathing-circle';
+            
+            document.getElementById('phaseText').textContent = '완료!';
+            document.getElementById('countdownText').textContent = '✓';
+            document.getElementById('instructionText').textContent = '호흡 루틴을 완료했습니다';
+            document.getElementById('progressBar').style.width = '100%';
+            
+            // Log activity
+            logActivity();
+            
+            setTimeout(() => {
+                document.getElementById('exerciseScreen').classList.add('hidden');
+            }, 3000);
+        }
+
+        // Log activity
+        async function logActivity() {
+            try {
+                await axios.post('/api/wellness/activities', {
+                    activity_type: 'breathing',
+                    content_id: currentRoutine.id,
+                    content_title: currentRoutine.title,
+                    duration_seconds: currentRoutine.duration_seconds,
+                    completed: true,
+                    rating: 5
+                });
+            } catch (error) {
+                console.error('Failed to log activity:', error);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('exitExercise').addEventListener('click', () => {
+            if (confirm('호흡 루틴을 중단하시겠습니까?')) {
+                clearInterval(phaseTimer);
+                document.getElementById('exerciseScreen').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('stopExercise').addEventListener('click', () => {
+            if (confirm('호흡 루틴을 중단하시겠습니까?')) {
+                clearInterval(phaseTimer);
+                document.getElementById('exerciseScreen').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('pauseResume').addEventListener('click', function() {
+            isPaused = !isPaused;
+            
+            if (isPaused) {
+                this.innerHTML = '<i class="fas fa-play mr-2"></i>재개';
+                document.getElementById('instructionText').textContent = '일시정지됨';
+            } else {
+                this.innerHTML = '<i class="fas fa-pause mr-2"></i>일시정지';
+                runPhase(currentPhase);
+            }
+        });
+
+        // Initialize
+        loadRoutines();
+    </script>
+</body>
+</html>

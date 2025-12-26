@@ -679,6 +679,378 @@ app.get('/api/care/alerts', async (c) => {
   }
 })
 
+// ==================== Medication Management API ====================
+
+// Get user medications
+app.get('/api/medications', async (c) => {
+  try {
+    const { DB } = c.env
+    const user_id = c.req.query('user_id') || '1'
+    const active_only = c.req.query('active_only') === 'true'
+    
+    let query = 'SELECT * FROM medications WHERE user_id = ?'
+    const params: any[] = [user_id]
+    
+    if (active_only) {
+      query += ' AND is_active = 1'
+    }
+    
+    query += ' ORDER BY created_at DESC'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ medications: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch medications' }, 500)
+  }
+})
+
+// Add medication
+app.post('/api/medications', async (c) => {
+  try {
+    const { DB } = c.env
+    const {
+      user_id = 1,
+      name,
+      dosage,
+      frequency,
+      prescribed_by,
+      start_date,
+      end_date,
+      notes
+    } = await c.req.json()
+    
+    const result = await DB.prepare(`
+      INSERT INTO medications (user_id, name, dosage, frequency, prescribed_by, start_date, end_date, notes, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `).bind(user_id, name, dosage, frequency, prescribed_by, start_date, end_date, notes).run()
+    
+    return c.json({ success: true, medication_id: result.meta.last_row_id })
+  } catch (error) {
+    return c.json({ error: 'Failed to add medication' }, 500)
+  }
+})
+
+// Log medication intake
+app.post('/api/medications/log', async (c) => {
+  try {
+    const { DB } = c.env
+    const {
+      medication_id,
+      user_id = 1,
+      taken,
+      taken_at,
+      scheduled_at,
+      notes
+    } = await c.req.json()
+    
+    const result = await DB.prepare(`
+      INSERT INTO medication_logs (medication_id, user_id, taken, taken_at, scheduled_at, notes)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(medication_id, user_id, taken ? 1 : 0, taken_at, scheduled_at, notes).run()
+    
+    return c.json({ success: true, log_id: result.meta.last_row_id })
+  } catch (error) {
+    return c.json({ error: 'Failed to log medication' }, 500)
+  }
+})
+
+// Get medication logs
+app.get('/api/medications/:id/logs', async (c) => {
+  try {
+    const { DB } = c.env
+    const medication_id = c.req.param('id')
+    const days = parseInt(c.req.query('days') || '7')
+    
+    const { results } = await DB.prepare(`
+      SELECT * FROM medication_logs 
+      WHERE medication_id = ? 
+      AND date(scheduled_at) >= date('now', '-' || ? || ' days')
+      ORDER BY scheduled_at DESC
+    `).bind(medication_id, days).all()
+    
+    return c.json({ logs: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch logs' }, 500)
+  }
+})
+
+// Get caregiver view of patient medications (with permission check)
+app.get('/api/care/patients/:id/medications', async (c) => {
+  try {
+    const { DB } = c.env
+    const patient_id = c.req.param('id')
+    const caregiver_id = c.req.query('caregiver_id') || '1'
+    
+    // Check care link and permissions
+    const careLink = await DB.prepare(`
+      SELECT * FROM care_links 
+      WHERE patient_id = ? AND caregiver_id = ? AND status = 'active'
+    `).bind(patient_id, caregiver_id).first()
+    
+    if (!careLink) {
+      return c.json({ error: 'No active care link found' }, 403)
+    }
+    
+    // Check shareMedication permission
+    const permissions = JSON.parse(careLink.permissions_json)
+    if (!permissions.shareMedication) {
+      return c.json({ error: 'No permission to view medications' }, 403)
+    }
+    
+    // Get medications and recent logs
+    const { results: medications } = await DB.prepare(`
+      SELECT * FROM medications WHERE user_id = ? AND is_active = 1
+    `).bind(patient_id).all()
+    
+    const medicationsWithLogs = await Promise.all(
+      medications.map(async (med: any) => {
+        const { results: logs } = await DB.prepare(`
+          SELECT * FROM medication_logs 
+          WHERE medication_id = ? 
+          AND date(scheduled_at) >= date('now', '-7 days')
+          ORDER BY scheduled_at DESC
+        `).bind(med.id).all()
+        
+        return { ...med, recent_logs: logs }
+      })
+    )
+    
+    return c.json({ medications: medicationsWithLogs })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch patient medications' }, 500)
+  }
+})
+
+// ==================== Care Notes API ====================
+
+// Create care note
+app.post('/api/care/notes', async (c) => {
+  try {
+    const { DB } = c.env
+    const {
+      care_link_id,
+      user_id = 1,
+      author_role,
+      note_type = 'general',
+      content,
+      flag = 'normal',
+      is_shared = false
+    } = await c.req.json()
+    
+    const result = await DB.prepare(`
+      INSERT INTO care_notes (care_link_id, user_id, author_role, note_type, content, flag, is_shared)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(care_link_id, user_id, author_role, note_type, content, flag, is_shared ? 1 : 0).run()
+    
+    // If flag is 'urgent' and is_shared, trigger alert logic here
+    // (For now, just return success)
+    
+    return c.json({ success: true, note_id: result.meta.last_row_id })
+  } catch (error) {
+    return c.json({ error: 'Failed to create note' }, 500)
+  }
+})
+
+// Get care notes
+app.get('/api/care/notes', async (c) => {
+  try {
+    const { DB } = c.env
+    const user_id = c.req.query('user_id') || '1'
+    const care_link_id = c.req.query('care_link_id')
+    const flag = c.req.query('flag')
+    
+    let query = 'SELECT * FROM care_notes WHERE 1=1'
+    const params: any[] = []
+    
+    if (user_id) {
+      query += ' AND user_id = ?'
+      params.push(user_id)
+    }
+    
+    if (care_link_id) {
+      query += ' AND care_link_id = ?'
+      params.push(care_link_id)
+    }
+    
+    if (flag) {
+      query += ' AND flag = ?'
+      params.push(flag)
+    }
+    
+    query += ' ORDER BY created_at DESC LIMIT 50'
+    const { results } = await DB.prepare(query).bind(...params).all()
+    return c.json({ notes: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch notes' }, 500)
+  }
+})
+
+// Get patient notes for caregiver
+app.get('/api/care/patients/:id/notes', async (c) => {
+  try {
+    const { DB } = c.env
+    const patient_id = c.req.param('id')
+    const caregiver_id = c.req.query('caregiver_id') || '1'
+    
+    // Check care link
+    const careLink = await DB.prepare(`
+      SELECT * FROM care_links 
+      WHERE patient_id = ? AND caregiver_id = ? AND status = 'active'
+    `).bind(patient_id, caregiver_id).first()
+    
+    if (!careLink) {
+      return c.json({ error: 'No active care link found' }, 403)
+    }
+    
+    // Get notes for this care link
+    const { results } = await DB.prepare(`
+      SELECT * FROM care_notes 
+      WHERE (care_link_id = ? OR (user_id = ? AND is_shared = 1))
+      ORDER BY created_at DESC LIMIT 50
+    `).bind(careLink.id, patient_id).all()
+    
+    return c.json({ notes: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch patient notes' }, 500)
+  }
+})
+
+// Medical provider view of patient notes (requires clinician role)
+app.get('/api/md/patients/:id/notes', async (c) => {
+  try {
+    const { DB } = c.env
+    const patient_id = c.req.param('id')
+    
+    // In production, check for clinician role here
+    // For now, return shared notes only
+    
+    const { results } = await DB.prepare(`
+      SELECT * FROM care_notes 
+      WHERE user_id = ? AND is_shared = 1
+      ORDER BY created_at DESC
+    `).bind(patient_id).all()
+    
+    return c.json({ notes: results })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch patient notes' }, 500)
+  }
+})
+
+// ==================== Patient Summary API (for Caregivers) ====================
+
+// Get patient sleep summary
+app.get('/api/care/patients/:id/summary', async (c) => {
+  try {
+    const { DB } = c.env
+    const patient_id = c.req.param('id')
+    const caregiver_id = c.req.query('caregiver_id') || '1'
+    
+    // Check care link
+    const careLink = await DB.prepare(`
+      SELECT * FROM care_links 
+      WHERE patient_id = ? AND caregiver_id = ? AND status = 'active'
+    `).bind(patient_id, caregiver_id).first()
+    
+    if (!careLink) {
+      return c.json({ error: 'No active care link found' }, 403)
+    }
+    
+    const permissions = JSON.parse(careLink.permissions_json)
+    
+    // Get latest sleep session
+    const latestSleep = await DB.prepare(`
+      SELECT * FROM sleep_sessions 
+      WHERE user_id = ? 
+      ORDER BY date DESC LIMIT 1
+    `).bind(patient_id).first()
+    
+    // Calculate sleep score (simplified)
+    const sleepScore = latestSleep ? Math.round(latestSleep.sleep_efficiency || 70) : null
+    
+    // Get today's risk score
+    const riskScore = await DB.prepare(`
+      SELECT * FROM risk_scores 
+      WHERE user_id = ? AND date = date('now')
+    `).bind(patient_id).first()
+    
+    // Build summary based on permissions
+    const summary: any = {
+      date: new Date().toISOString().split('T')[0],
+      patient_id: patient_id
+    }
+    
+    if (permissions.shareScore) {
+      summary.sleepScore = sleepScore
+      summary.awakenings = latestSleep?.awakenings_count || 0
+    }
+    
+    if (permissions.shareRoutine) {
+      summary.routineCompleted = true // Simplified
+    }
+    
+    if (permissions.shareRisk) {
+      summary.riskLevel = latestSleep?.risk_level || 'green'
+    }
+    
+    return c.json({ success: true, data: summary })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch summary' }, 500)
+  }
+})
+
+// Get patient sleep history
+app.get('/api/care/patients/:id/history', async (c) => {
+  try {
+    const { DB } = c.env
+    const patient_id = c.req.param('id')
+    const caregiver_id = c.req.query('caregiver_id') || '1'
+    const days = parseInt(c.req.query('days') || '7')
+    
+    // Check care link
+    const careLink = await DB.prepare(`
+      SELECT * FROM care_links 
+      WHERE patient_id = ? AND caregiver_id = ? AND status = 'active'
+    `).bind(patient_id, caregiver_id).first()
+    
+    if (!careLink) {
+      return c.json({ error: 'No active care link found' }, 403)
+    }
+    
+    const permissions = JSON.parse(careLink.permissions_json)
+    
+    if (!permissions.shareScore && !permissions.shareRisk) {
+      return c.json({ error: 'No permission to view history' }, 403)
+    }
+    
+    // Get sleep history
+    const { results } = await DB.prepare(`
+      SELECT date, sleep_efficiency, awakenings_count, sleep_quality, risk_level
+      FROM sleep_sessions 
+      WHERE user_id = ? 
+      AND date >= date('now', '-' || ? || ' days')
+      ORDER BY date DESC
+    `).bind(patient_id, days).all()
+    
+    // Filter based on permissions
+    const history = results.map((record: any) => {
+      const entry: any = { date: record.date }
+      
+      if (permissions.shareScore) {
+        entry.sleepScore = Math.round(record.sleep_efficiency || 70)
+      }
+      
+      if (permissions.shareRisk) {
+        entry.risk = record.risk_level || 'green'
+      }
+      
+      return entry
+    })
+    
+    return c.json({ success: true, data: history })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch history' }, 500)
+  }
+})
+
 // ==================== Frontend Routes ====================
 
 // Wellness Hub
@@ -1064,6 +1436,48 @@ app.get('/', (c) => {
     </body>
     </html>
   `)
+})
+
+// ==================== Additional Page Routes ====================
+
+// CBT-I Program Page
+app.get('/program', (c) => {
+  return c.redirect('/static/program.html')
+})
+
+// Sleep Log Page
+app.get('/sleep-log', (c) => {
+  return c.redirect('/static/sleep-log.html')
+})
+
+// About Page
+app.get('/about', (c) => {
+  return c.redirect('/static/about.html')
+})
+
+// Privacy Policy Page
+app.get('/privacy', (c) => {
+  return c.redirect('/static/privacy.html')
+})
+
+// Terms of Service Page
+app.get('/terms', (c) => {
+  return c.redirect('/static/terms.html')
+})
+
+// Wellness Yoga Page
+app.get('/wellness/yoga', (c) => {
+  return c.redirect('/static/yoga.html')
+})
+
+// Wellness Breathing Page
+app.get('/wellness/breathing', (c) => {
+  return c.redirect('/static/breathing.html')
+})
+
+// Wellness ASMR Page
+app.get('/wellness/asmr', (c) => {
+  return c.redirect('/static/asmr.html')
 })
 
 export default app

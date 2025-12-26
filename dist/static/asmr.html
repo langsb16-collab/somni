@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASMR 사운드룸 - SomniCare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sleep-gradient { background: linear-gradient(135deg, #1f7ed6 0%, #1560a8 100%); }
+        .asmr-gradient { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        
+        .night-mode {
+            filter: brightness(0.3);
+            background: #000;
+        }
+        
+        .night-mode .sleep-gradient {
+            background: linear-gradient(135deg, #0f3a5f 0%, #0a2540 100%);
+        }
+        
+        .sound-wave {
+            width: 4px;
+            height: 40px;
+            background: linear-gradient(to top, #fa709a, #fee140);
+            margin: 0 2px;
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+        
+        @keyframes wave {
+            0%, 100% { height: 20px; }
+            50% { height: 60px; }
+        }
+        
+        .sound-wave:nth-child(1) { animation-delay: 0s; }
+        .sound-wave:nth-child(2) { animation-delay: 0.1s; }
+        .sound-wave:nth-child(3) { animation-delay: 0.2s; }
+        .sound-wave:nth-child(4) { animation-delay: 0.3s; }
+        .sound-wave:nth-child(5) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="sleep-gradient text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/wellness" class="flex items-center space-x-3">
+                    <i class="fas fa-volume-up text-2xl"></i>
+                    <div>
+                        <h1 class="text-xl font-bold">ASMR 사운드룸</h1>
+                        <p class="text-xs opacity-90">SomniCare 웰니스</p>
+                    </div>
+                </a>
+                <div class="flex items-center space-x-4">
+                    <button id="nightModeToggle" class="text-sm hover:opacity-80">
+                        <i class="fas fa-moon mr-1"></i>심야모드
+                    </button>
+                    <a href="/wellness" class="text-sm hover:opacity-80"><i class="fas fa-arrow-left mr-1"></i>웰니스 허브</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="asmr-gradient text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-3">
+                <i class="fas fa-volume-up mr-2"></i>
+                ASMR & 힐링 사운드
+            </h2>
+            <p class="text-lg mb-2 opacity-90">
+                편안한 자연음과 바이노럴 사운드로 깊은 이완과 수면 유도
+            </p>
+            <p class="text-sm opacity-80">
+                <i class="fas fa-headphones mr-1"></i>
+                이어폰 착용 시 최적의 효과를 경험하실 수 있습니다
+            </p>
+        </div>
+    </section>
+
+    <!-- Sound Player -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Current Playing -->
+        <div id="currentPlayer" class="hidden bg-white rounded-2xl shadow-lg p-8 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-4">
+                    <div id="playerThumbnail" class="w-20 h-20 bg-gradient-to-br from-pink-400 to-yellow-400 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-music text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="playerTitle" class="text-2xl font-bold text-gray-800">-</h3>
+                        <p id="playerCategory" class="text-sm text-gray-600">-</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="sound-wave"></div>
+                    <div class="sound-wave"></div>
+                    <div class="sound-wave"></div>
+                    <div class="sound-wave"></div>
+                    <div class="sound-wave"></div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 mb-6">
+                <button id="playPauseBtn" class="w-16 h-16 bg-gradient-to-r from-pink-500 to-yellow-500 text-white rounded-full hover:opacity-90 transition">
+                    <i class="fas fa-play text-2xl"></i>
+                </button>
+                <button id="stopBtn" class="w-16 h-16 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition">
+                    <i class="fas fa-stop text-2xl"></i>
+                </button>
+                
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-volume-down text-gray-600"></i>
+                        <input id="volumeSlider" type="range" min="0" max="100" value="70" class="flex-1">
+                        <i class="fas fa-volume-up text-gray-600"></i>
+                        <span id="volumeValue" class="text-sm font-semibold text-gray-700 w-12 text-right">70%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-3">
+                <button class="timer-btn px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold hover:bg-blue-200 transition" data-minutes="10">
+                    <i class="far fa-clock mr-1"></i>10분
+                </button>
+                <button class="timer-btn px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold hover:bg-blue-200 transition" data-minutes="20">
+                    <i class="far fa-clock mr-1"></i>20분
+                </button>
+                <button class="timer-btn px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold hover:bg-blue-200 transition" data-minutes="30">
+                    <i class="far fa-clock mr-1"></i>30분
+                </button>
+                <button class="timer-btn px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-semibold hover:bg-blue-200 transition" data-minutes="60">
+                    <i class="far fa-clock mr-1"></i>60분
+                </button>
+            </div>
+            
+            <div id="timerStatus" class="hidden mt-4 p-4 bg-yellow-50 rounded-lg">
+                <p id="timerText" class="text-sm text-yellow-800 font-semibold">
+                    <i class="fas fa-clock mr-2"></i>-
+                </p>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="flex flex-wrap gap-2 justify-center mb-8">
+            <button class="filter-btn bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition" data-category="all">
+                전체
+            </button>
+            <button class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-semibold transition hover:bg-gray-300" data-category="rain">
+                빗소리
+            </button>
+            <button class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-semibold transition hover:bg-gray-300" data-category="ocean">
+                파도소리
+            </button>
+            <button class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-semibold transition hover:bg-gray-300" data-category="forest">
+                숲 속
+            </button>
+            <button class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-semibold transition hover:bg-gray-300" data-category="fire">
+                장작불
+            </button>
+            <button class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-semibold transition hover:bg-gray-300" data-category="white_noise">
+                백색소음
+            </button>
+        </div>
+
+        <!-- ASMR Sounds List -->
+        <div id="soundsList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Night Mode Overlay -->
+    <div id="nightOverlay" class="hidden fixed inset-0 bg-black bg-opacity-90 z-40 flex items-center justify-center">
+        <div class="text-center text-white">
+            <i class="fas fa-moon text-6xl mb-4 opacity-50"></i>
+            <p class="text-xl opacity-70">심야 모드 활성화</p>
+            <p class="text-sm opacity-50 mt-2">편안한 숙면을 위해 화면을 어둡게 했습니다</p>
+            <button id="exitNightMode" class="mt-6 px-6 py-2 bg-white bg-opacity-20 rounded-full text-sm hover:bg-opacity-30 transition">
+                나가기
+            </button>
+        </div>
+    </div>
+
+    <audio id="asmrAudio" preload="metadata"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+        let soundsData = [];
+        let currentSound = null;
+        let isPlaying = false;
+        let timerEndTime = null;
+        let timerInterval = null;
+        let fadeInterval = null;
+        let isNightMode = false;
+
+        const audio = document.getElementById('asmrAudio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        // Load ASMR sounds
+        async function loadSounds(category = 'all') {
+            try {
+                const response = await axios.get('/api/wellness/asmr');
+                soundsData = response.data.asmr || [];
+                
+                const filtered = category === 'all' 
+                    ? soundsData 
+                    : soundsData.filter(s => s.category === category);
+                
+                displaySounds(filtered);
+            } catch (error) {
+                console.error('Failed to load ASMR sounds:', error);
+            }
+        }
+
+        // Display sounds
+        function displaySounds(sounds) {
+            const list = document.getElementById('soundsList');
+            list.innerHTML = sounds.map(sound => `
+                <div class="bg-white rounded-xl p-6 card-hover cursor-pointer" onclick="playSound(${sound.id})">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">${sound.title}</h3>
+                            <p class="text-sm text-gray-600">${getCategoryLabel(sound.category)}</p>
+                        </div>
+                        <div class="text-yellow-500">
+                            <i class="fas fa-star"></i>
+                            <span class="text-sm font-semibold">${sound.rating}</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-sm text-gray-600 mb-4">${sound.description}</p>
+                    
+                    <div class="flex items-center gap-2 text-sm">
+                        ${sound.is_binaural ? '<span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full"><i class="fas fa-headphones mr-1"></i>바이노럴</span>' : ''}
+                        ${sound.night_mode_optimized ? '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full"><i class="fas fa-moon mr-1"></i>심야최적화</span>' : ''}
+                    </div>
+                    
+                    <div class="mt-4 flex items-center justify-between">
+                        <span class="text-sm text-gray-500">
+                            <i class="fas fa-play-circle mr-1"></i>${sound.play_count.toLocaleString()}회 재생
+                        </span>
+                        <button class="bg-gradient-to-r from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition">
+                            재생
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Play sound
+        window.playSound = function(id) {
+            const sound = soundsData.find(s => s.id === id);
+            if (!sound) return;
+            
+            currentSound = sound;
+            
+            // Update player
+            document.getElementById('currentPlayer').classList.remove('hidden');
+            document.getElementById('playerTitle').textContent = sound.title;
+            document.getElementById('playerCategory').textContent = getCategoryLabel(sound.category);
+            
+            // Set audio source
+            audio.src = sound.audio_url;
+            audio.loop = true;
+            audio.volume = volumeSlider.value / 100;
+            audio.play();
+            
+            isPlaying = true;
+            playPauseBtn.innerHTML = '<i class="fas fa-pause text-2xl"></i>';
+            
+            // Scroll to player
+            document.getElementById('currentPlayer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        // Play/Pause
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                playPauseBtn.innerHTML = '<i class="fas fa-play text-2xl"></i>';
+                isPlaying = false;
+            } else {
+                audio.play();
+                playPauseBtn.innerHTML = '<i class="fas fa-pause text-2xl"></i>';
+                isPlaying = true;
+            }
+        });
+
+        // Stop
+        stopBtn.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
+            playPauseBtn.innerHTML = '<i class="fas fa-play text-2xl"></i>';
+            isPlaying = false;
+            cancelTimer();
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            audio.volume = volume / 100;
+            document.getElementById('volumeValue').textContent = `${volume}%`;
+        });
+
+        // Timer
+        document.querySelectorAll('.timer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const minutes = parseInt(btn.dataset.minutes);
+                setTimer(minutes);
+            });
+        });
+
+        function setTimer(minutes) {
+            cancelTimer();
+            
+            timerEndTime = Date.now() + minutes * 60 * 1000;
+            document.getElementById('timerStatus').classList.remove('hidden');
+            
+            timerInterval = setInterval(() => {
+                const remaining = timerEndTime - Date.now();
+                
+                if (remaining <= 0) {
+                    startFadeOut();
+                    return;
+                }
+                
+                const mins = Math.floor(remaining / 60000);
+                const secs = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('timerText').innerHTML = 
+                    `<i class="fas fa-clock mr-2"></i>${mins}분 ${secs}초 후 자동 종료 (페이드아웃)`;
+            }, 1000);
+        }
+
+        function startFadeOut() {
+            clearInterval(timerInterval);
+            document.getElementById('timerText').innerHTML = '<i class="fas fa-volume-down mr-2"></i>페이드아웃 중...';
+            
+            const startVolume = audio.volume;
+            const fadeSteps = 30;
+            const fadeTime = 1000;
+            let currentStep = 0;
+            
+            fadeInterval = setInterval(() => {
+                currentStep++;
+                audio.volume = startVolume * (1 - currentStep / fadeSteps);
+                
+                if (currentStep >= fadeSteps) {
+                    clearInterval(fadeInterval);
+                    stopBtn.click();
+                    document.getElementById('timerStatus').classList.add('hidden');
+                }
+            }, fadeTime);
+        }
+
+        function cancelTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            if (fadeInterval) {
+                clearInterval(fadeInterval);
+                fadeInterval = null;
+            }
+            document.getElementById('timerStatus').classList.add('hidden');
+        }
+
+        // Night mode
+        document.getElementById('nightModeToggle').addEventListener('click', () => {
+            isNightMode = !isNightMode;
+            
+            if (isNightMode) {
+                document.body.classList.add('night-mode');
+                document.getElementById('nightOverlay').classList.remove('hidden');
+            } else {
+                document.body.classList.remove('night-mode');
+                document.getElementById('nightOverlay').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('exitNightMode').addEventListener('click', () => {
+            isNightMode = false;
+            document.body.classList.remove('night-mode');
+            document.getElementById('nightOverlay').classList.add('hidden');
+        });
+
+        // Category filter
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-pink-600', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                btn.classList.add('bg-pink-600', 'text-white');
+                btn.classList.remove('bg-gray-200', 'text-gray-700');
+                
+                const category = btn.dataset.category;
+                loadSounds(category);
+            });
+        });
+
+        // Helper
+        function getCategoryLabel(category) {
+            const labels = {
+                rain: '빗소리',
+                ocean: '파도소리',
+                forest: '숲 속',
+                fire: '장작불',
+                wind: '바람소리',
+                white_noise: '백색소음',
+                pink_noise: '핑크소음',
+                brown_noise: '브라운소음'
+            };
+            return labels[category] || category;
+        }
+
+        // Initialize
+        loadSounds();
+    </script>
+</body>
+</html>
