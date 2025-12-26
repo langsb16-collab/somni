@@ -230,12 +230,12 @@ var vt=Object.defineProperty;var He=e=>{throw TypeError(e)};var xt=(e,t,r)=>t in
     <body class="bg-gray-50">
         <!-- Header -->
         <header class="sleep-gradient text-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-3 py-3 md:py-4">
+            <div class="max-w-7xl mx-auto px-3 py-2 md:py-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <i class="fas fa-moon text-xl md:text-2xl"></i>
+                        <i class="fas fa-moon text-lg md:text-xl"></i>
                         <div>
-                            <h1 class="text-lg md:text-xl font-bold">SomniCare</h1>
+                            <h1 class="text-base md:text-lg font-bold">SomniCare</h1>
                             <p class="text-xs opacity-90 hidden sm:block">불면증 치료·케어 플랫폼</p>
                         </div>
                     </div>
@@ -248,7 +248,7 @@ var vt=Object.defineProperty;var He=e=>{throw TypeError(e)};var xt=(e,t,r)=>t in
                             <a href="/clinics" class="hover:opacity-80">병원찾기</a>
                         </nav>
                         <div class="lang-dropdown">
-                            <button class="px-3 py-1.5 bg-white bg-opacity-20 rounded-lg text-xs md:text-sm font-semibold hover:bg-opacity-30 transition flex items-center gap-1">
+                            <button class="px-2 py-1 bg-white bg-opacity-20 rounded-lg text-xs md:text-sm font-semibold hover:bg-opacity-30 transition flex items-center gap-1">
                                 <i class="fas fa-globe"></i>
                                 <span class="hidden sm:inline">한국어</span>
                                 <i class="fas fa-chevron-down text-xs"></i>
@@ -265,20 +265,20 @@ var vt=Object.defineProperty;var He=e=>{throw TypeError(e)};var xt=(e,t,r)=>t in
         </header>
 
         <!-- Hero Section -->
-        <section class="sleep-gradient text-white py-8 md:py-12">
+        <section class="sleep-gradient text-white py-5 md:py-10">
             <div class="max-w-7xl mx-auto px-3 text-center">
-                <h2 class="text-2xl md:text-4xl font-bold mb-3">
+                <h2 class="text-lg md:text-3xl font-bold mb-2 leading-tight">
                     당신의 잠은 치료 받을 수 있습니다
                 </h2>
-                <p class="text-sm md:text-lg mb-6 opacity-90 text-truncate-2">
-                    과학 기반 맞춤 수면 루틴 + 가족/보호자 케어 + 병원 연계까지 한 번에
+                <p class="text-xs md:text-base mb-4 opacity-90 leading-tight">
+                    과학적 맞춤 수면루틴 + 가족/보호자 케어 + 병원 연계까지
                 </p>
                 <div class="flex flex-col sm:flex-row gap-2 md:gap-3 justify-center">
-                    <a href="/assessment" class="bg-white text-blue-600 px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-bold text-sm md:text-base hover:bg-gray-100 transition">
+                    <a href="/assessment" class="bg-white text-blue-600 px-4 md:px-6 py-2 md:py-2.5 rounded-lg font-bold text-xs md:text-sm hover:bg-gray-100 transition">
                         <i class="fas fa-clipboard-check mr-1"></i>
                         무료 불면증 검사
                     </a>
-                    <a href="/program" class="bg-blue-800 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-bold text-sm md:text-base hover:bg-blue-900 transition border-2 border-white">
+                    <a href="/program" class="bg-blue-800 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-lg font-bold text-xs md:text-sm hover:bg-blue-900 transition border-2 border-white">
                         <i class="fas fa-book-medical mr-1"></i>
                         프로그램 보기
                     </a>
