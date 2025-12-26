@@ -1,0 +1,229 @@
+# SomniCare - 불면증 치료·케어 종합 관리 플랫폼
+
+## 프로젝트 개요
+
+**SomniCare**는 불면증을 단순히 검사하고 끝나는 것이 아니라, **진단 → 치료 → 생활습관 → 병원 연계**까지 풀 사이클로 관리하는 디지털 수면 클리닉 플랫폼입니다.
+
+### 목표
+- 만성 불면/수면장애 환자를 위한 종합 케어 솔루션 제공
+- 과학적 근거 기반 CBT-I (인지행동치료) 프로그램 제공
+- 실시간 환경·행동 데이터 기반 불면 리스크 예측
+- 가족/보호자 연동 케어 시스템
+- 전국 수면클리닉 연계 서비스
+
+## 주요 기능 (완료된 기능)
+
+### ✅ 1. 불면증 자가진단 (ISI)
+- **7문항 ISI (Insomnia Severity Index)** 평가
+- 실시간 점수 계산 및 해석
+- 이메일 결과 전송 (선택)
+- 다국어 지원 (한국어/영어/중국어)
+- 점수별 맞춤 수면 루틴 추천
+- 유튜브 수면 개선 영상 추천
+
+**URL**: `/assessment`
+
+**특징**:
+- 0-7점: 정상 범위
+- 8-14점: 경도 불면
+- 15-21점: 중등도 불면
+- 22-28점: 중증 불면 (전문 상담 권장 + 병원 안내)
+
+### ✅ 2. 병원 연계 시스템
+- 전국 수면클리닉 데이터베이스
+- 수면다원검사 가능 병원 표시
+- 병원 위치, 연락처, 웹사이트 정보 제공
+- 지역별 검색 기능
+
+**URL**: `/clinics`
+
+**샘플 병원**:
+- 삼성서울병원 수면질환센터
+- 분당서울대병원 수면센터
+- 서울아산병원 수면다원검사실
+
+### ✅ 3. REST API 엔드포인트
+- `GET /api/health` - 헬스체크
+- `GET /api/questionnaires` - 전체 설문 목록
+- `GET /api/questionnaires/:type` - 특정 설문 조회
+- `POST /api/questionnaires/:type/responses` - 설문 응답 저장
+- `GET /api/sleep-sessions` - 수면 세션 조회
+- `POST /api/sleep-sessions` - 수면 세션 저장
+- `GET /api/risk-score/today` - 오늘의 리스크 점수
+- `POST /api/risk-score` - 리스크 점수 저장
+- `GET /api/clinics` - 병원 검색
+- `GET /api/clinics/:id` - 병원 상세 조회
+- `GET /api/cbt/programs` - CBT-I 프로그램 목록
+- `GET /api/cbt/programs/:id/modules` - 프로그램 모듈 조회
+- `GET /api/dashboard` - 사용자 대시보드 데이터
+
+### ✅ 4. 데이터베이스 (Cloudflare D1)
+- **users** - 사용자 정보
+- **profiles** - 사용자 프로필
+- **sleep_sessions** - 수면 기록
+- **questionnaires** - 설문지 (ISI, PSQI, PHQ-9, GAD-7)
+- **questionnaire_responses** - 설문 응답
+- **cbt_programs** - CBT-I 프로그램
+- **cbt_modules** - CBT-I 모듈
+- **user_cbt_progress** - CBT 진행 상황
+- **risk_scores** - 불면 리스크 점수
+- **events** - 알림/이벤트
+- **clinics** - 병원 정보
+- **care_links** - 보호자 연결
+- **daily_habits** - 일일 습관 기록
+- **coach_conversations** - AI 코치 대화 기록
+
+## 아직 구현하지 않은 기능
+
+### 🚧 5. AI 수면 코치
+- 대화형 챗봇 인터페이스
+- 실시간 수면 상담
+- 맞춤 루틴 추천
+
+### 🚧 6. CBT-I 프로그램 페이지
+- 6주 단계별 프로그램 진행
+- 주차별 모듈 콘텐츠
+- 진행률 추적
+
+### 🚧 7. 수면 일지
+- 일일 수면 기록
+- 수면 효율 계산
+- 통계 그래프
+
+### 🚧 8. 실시간 불면 리스크 스코어
+- 폰 센서 데이터 수집
+- 환경 요인 분석 (조도, 소음)
+- 행동 패턴 분석 (화면 사용)
+
+### 🚧 9. 가족/케어 모드
+- 보호자 앱 연동
+- 대상자 수면 모니터링
+- 야간 이상행동 감지
+
+### 🚧 10. 정부/지자체 포털
+- KPI 대시보드
+- 통계 보고서
+- 데이터 분석
+
+## 기술 스택
+
+- **Framework**: Hono (경량 웹 프레임워크)
+- **Runtime**: Cloudflare Pages/Workers
+- **Database**: Cloudflare D1 (SQLite)
+- **Frontend**: Vanilla JavaScript + Tailwind CSS
+- **Build Tool**: Vite
+- **Package Manager**: npm
+
+## 로컬 개발 환경 설정
+
+### 1. 의존성 설치
+```bash
+cd /home/user/webapp
+npm install
+```
+
+### 2. 데이터베이스 마이그레이션
+```bash
+# 로컬 D1 데이터베이스에 스키마 적용
+npm run db:migrate:local
+
+# 샘플 데이터 주입
+npm run db:seed
+```
+
+### 3. 빌드
+```bash
+npm run build
+```
+
+### 4. 로컬 서버 실행
+```bash
+# PM2로 실행 (권장)
+fuser -k 3000/tcp 2>/dev/null || true
+pm2 start ecosystem.config.cjs
+
+# 서버 상태 확인
+curl http://localhost:3000/api/health
+
+# 로그 확인
+pm2 logs somnicare --nostream
+```
+
+## 배포
+
+### Cloudflare Pages 배포
+```bash
+# 프로덕션 배포
+npm run deploy
+
+# 데이터베이스 마이그레이션 (프로덕션)
+npm run db:migrate:prod
+```
+
+## 프로젝트 구조
+
+```
+webapp/
+├── src/
+│   └── index.tsx              # 메인 Hono 애플리케이션
+├── public/
+│   └── static/
+│       └── assessment.html    # ISI 자가진단 페이지
+├── migrations/
+│   └── 0001_initial_schema.sql # DB 스키마
+├── seed.sql                   # 샘플 데이터
+├── ecosystem.config.cjs       # PM2 설정
+├── wrangler.jsonc            # Cloudflare 설정
+├── package.json              # NPM 스크립트
+└── README.md                 # 프로젝트 문서
+```
+
+## URLs
+
+- **홈페이지**: `/`
+- **ISI 자가진단**: `/assessment`
+- **병원 찾기**: `/clinics`
+- **API 문서**: `/api/health` (헬스체크)
+
+## 데이터 모델
+
+### Users (사용자)
+- 이메일, 이름, 성별, 출생연도, 역할, 언어, 타임존
+
+### Sleep Sessions (수면 세션)
+- 수면 시작 시간, 기상 시간, 각성 횟수, 수면 효율, 수면 질
+
+### Questionnaires (설문지)
+- ISI, PSQI, PHQ-9, GAD-7
+
+### CBT Programs (CBT-I 프로그램)
+- 6주 프로그램, 주차별 모듈
+
+### Risk Scores (리스크 점수)
+- 일일 불면 리스크, 화면 사용 시간, 소음 레벨, 조도 레벨
+
+## 향후 개발 계획
+
+1. **AI 코치 통합** - OpenAI GPT-4 기반 대화형 상담
+2. **센서 데이터 수집** - 실시간 환경 모니터링
+3. **가족 케어 모드** - 보호자 앱 개발
+4. **정부 과제 대시보드** - KPI 및 통계 시각화
+5. **모바일 앱** - React Native 또는 Flutter
+6. **웨어러블 연동** - 애플워치, 갤럭시워치 등
+
+## 라이선스
+
+MIT License
+
+## 작성자
+
+SomniCare Development Team - 2025
+
+## 연락처
+
+문의사항은 GitHub Issues를 통해 남겨주세요.
+
+---
+
+**마지막 업데이트**: 2025-01-26
+**버전**: 0.1.0 (MVP)

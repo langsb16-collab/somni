@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>불면증 자가진단 (ISI) - SomniCare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+      .sleep-gradient {
+        background: linear-gradient(135deg, #1f7ed6 0%, #1560a8 100%);
+      }
+      .clinic-card {
+        transition: all 0.3s ease;
+      }
+      .clinic-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="sleep-gradient text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <i class="fas fa-moon text-2xl"></i>
+                    <div>
+                        <h1 class="text-xl font-bold">SomniCare</h1>
+                        <p class="text-xs opacity-90">불면증 치료·케어 플랫폼</p>
+                    </div>
+                </a>
+                <a href="/" class="text-sm hover:opacity-80">
+                    <i class="fas fa-home mr-1"></i> 홈으로
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- ISI Test Form -->
+        <div id="testSection" class="bg-white rounded-xl shadow-md p-8 mb-8">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">
+                    <i class="fas fa-file-medical text-blue-600 mr-2"></i>
+                    불면증 자가검사 (ISI)
+                </h2>
+                <p class="text-gray-600">
+                    지난 2주간의 수면 상태를 기준으로 답해주세요. (소요시간: 약 3분)
+                </p>
+            </div>
+
+            <!-- Language Selector -->
+            <div class="mb-6 flex gap-2">
+                <button onclick="setLang('ko')" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium" id="lang-ko">한국어</button>
+                <button onclick="setLang('en')" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium" id="lang-en">English</button>
+                <button onclick="setLang('cn')" class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium" id="lang-cn">中文</button>
+            </div>
+
+            <!-- Email Input (Optional) -->
+            <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-envelope mr-2"></i>
+                    <span data-lang="emailLabel">결과를 받을 이메일 (선택)</span>
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    placeholder="your@email.com"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                <label class="flex items-center mt-2 text-sm text-gray-600">
+                    <input type="checkbox" id="sendEmail" class="mr-2">
+                    <span data-lang="emailCheck">검사 결과를 이메일로 받습니다</span>
+                </label>
+            </div>
+
+            <form id="isiForm" class="space-y-6">
+                <!-- Question 1 -->
+                <div class="border-b border-gray-200 pb-4">
+                    <label class="block text-lg font-medium text-gray-800 mb-3" data-q="1">
+                        1. 잠들기 어려움
+                    </label>
+                    <select name="q1" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택해주세요</option>
+                        <option value="0">0 - 전혀 없음</option>
+                        <option value="1">1 - 가끔</option>
+                        <option value="2">2 - 때때로</option>
+                        <option value="3">3 - 자주</option>
+                        <option value="4">4 - 매우 심함</option>
+                    </select>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="border-b border-gray-200 pb-4">
+                    <label class="block text-lg font-medium text-gray-800 mb-3" data-q="2">
+                        2. 수면 유지 어려움 / 자주 깸
+                    </label>
+                    <select name="q2" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택해주세요</option>
+                        <option value="0">0 - 전혀 없음</option>
+                        <option value="1">1 - 가끔</option>
+                        <option value="2">2 - 때때로</option>
+                        <option value="3">3 - 자주</option>
+                        <option value="4">4 - 매우 심함</option>
+                    </select>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="border-b border-gray-200 pb-4">
+                    <label class="block text-lg font-medium text-gray-800 mb-3" data-q="3">
+                        3. 너무 일찍 깸
+                    </label>
+                    <select name="q3" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택해주세요</option>
+                        <option value="0">0 - 전혀 없음</option>
+                        <option value="1">1 - 가끔</option>
+                        <option value="2">2 - 때때로</option>
+                        <option value="3">3 - 자주</option>
+                        <option value="4">4 - 매우 심함</option>
+                    </select>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="border-b border-gray-200 pb-4">
+                    <label class="block text-lg font-medium text-gray-800 mb-3" data-q="4">
+                        4. 수면 만족도
+                    </label>
+                    <select name="q4" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택해주세요</option>
+                        <option value="0">0 - 매우 만족</option>
+                        <option value="1">1 - 약간 만족</option>
+                        <option value="2">2 - 보통</option>
+                        <option value="3">3 - 불만족</option>
+                        <option value="4">4 - 매우 불만족</option>
+                    </select>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="border-b border-gray-200 pb-4">
+                    <label class="block text-lg font-medium text-gray-800 mb-3" data-q="5">
+                        5. 일상 기능 영향
+                    </label>
+                    <select name="q5" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택해주세요</option>
+                        <option value="0">0 - 영향 없음</option>
+                        <option value="1">1 - 약간 영향</option>
+                        <option value="2">2 - 보통 영향</option>
+                        <option value="3">3 - 큰 영향</option>
+                        <option value="4">4 - 매우 큰 영향</option>
+                    </select>
+                </div>
+
+                <!-- Question 6 -->
+                <div class="border-b border-gray-200 pb-4">
+                    <label class="block text-lg font-medium text-gray-800 mb-3" data-q="6">
+                        6. 스트레스·걱정 수준
+                    </label>
+                    <select name="q6" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택해주세요</option>
+                        <option value="0">0 - 전혀 없음</option>
+                        <option value="1">1 - 약간</option>
+                        <option value="2">2 - 보통</option>
+                        <option value="3">3 - 심함</option>
+                        <option value="4">4 - 매우 심함</option>
+                    </select>
+                </div>
+
+                <!-- Question 7 -->
+                <div class="pb-4">
+                    <label class="block text-lg font-medium text-gray-800 mb-3" data-q="7">
+                        7. 전체적 심각도
+                    </label>
+                    <select name="q7" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">선택해주세요</option>
+                        <option value="0">0 - 없음</option>
+                        <option value="1">1 - 경미</option>
+                        <option value="2">2 - 보통</option>
+                        <option value="3">3 - 심각</option>
+                        <option value="4">4 - 매우 심각</option>
+                    </select>
+                </div>
+
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition flex items-center justify-center"
+                >
+                    <i class="fas fa-calculator mr-2"></i>
+                    점수 계산하기
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Section (Hidden initially) -->
+        <div id="resultSection" class="hidden">
+            <!-- Score Card -->
+            <div id="scoreCard" class="bg-white rounded-xl shadow-md p-8 mb-6"></div>
+            
+            <!-- Routine Recommendations -->
+            <div id="routineCard" class="bg-blue-50 rounded-xl p-8 mb-6"></div>
+            
+            <!-- YouTube Recommendations -->
+            <div id="youtubeCard" class="bg-purple-50 rounded-xl p-8 mb-6"></div>
+            
+            <!-- Clinic Links (Shown for severe cases) -->
+            <div id="clinicSection" class="hidden bg-orange-50 rounded-xl p-8 mb-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">
+                    <i class="fas fa-hospital text-orange-600 mr-2"></i>
+                    전국 수면클리닉 안내
+                </h3>
+                <div id="clinicList" class="space-y-4"></div>
+                <div class="mt-6">
+                    <a href="/clinics" class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700 transition">
+                        <i class="fas fa-map-marked-alt mr-2"></i>
+                        더 많은 병원 찾기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <script>
+      const lang_data = {
+        ko: {
+          emailLabel: '결과를 받을 이메일 (선택)',
+          emailCheck: '검사 결과를 이메일로 받습니다',
+          q1: '1. 잠들기 어려움',
+          q2: '2. 수면 유지 어려움 / 자주 깸',
+          q3: '3. 너무 일찍 깸',
+          q4: '4. 수면 만족도',
+          q5: '5. 일상 기능 영향',
+          q6: '6. 스트레스·걱정 수준',
+          q7: '7. 전체적 심각도',
+          interpretation: ['정상 범위', '경도 불면', '중등도 불면', '중증 불면'],
+          routines: [
+            `● 기본 수면 루틴 제안\n- 취침·기상 시간을 매일 30분 이내로 일정하게 유지\n- 오후 3시 이후 카페인 줄이기\n- 잠들기 1시간 전 스마트폰 화면 줄이기\n- 침대는 수면 전용 공간으로 사용`,
+            `● 경도 불면 루틴 제안\n- 매일 같은 시간에 일어나기 (주말 포함)\n- 20~30분 가벼운 걷기·스트레칭\n- 잠이 안 올 때 20분 후 일어나서 조용한 활동\n- 알코올로 잠 유도하지 않기`,
+            `● 중등도 불면 루틴 제안\n- 기상 시간 철저히 고정 + 햇빛 쬐기 10~15분\n- 자기 전 2시간 디지털 디톡스\n- 침실 온도 18~22℃, 따뜻한 간접등 사용\n- 4주 이상 지속 시 수면일지 기록`,
+            `● 심한 불면 루틴 + 상담 권장\n- 모든 수면위생 수칙 적용 (최소 2주)\n- 인지행동치료(CBT-I) 권장\n- 수면무호흡 여부 확인\n- 전문 수면클리닉 상담 적극 권장`
+          ],
+          videos: [
+            { title: '6 tips for better sleep (TED)', url: 'https://www.youtube.com/watch?v=t0kACis_dJE' },
+            { title: 'Unlock Better Sleep: Beat Insomnia', url: 'https://www.youtube.com/watch?v=4WASgOyGjjQ' },
+            { title: 'Breaking the Insomnia Cycle', url: 'https://www.youtube.com/watch?v=su7ghp477ws' },
+            { title: 'CBT-I: Gold Standard Treatment', url: 'https://www.youtube.com/watch?v=vP9d8FyUBfU' }
+          ]
+        }
+      };
+
+      let currentLang = 'ko';
+
+      function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-lang]').forEach(el => {
+          const key = el.getAttribute('data-lang');
+          if (lang_data[lang] && lang_data[lang][key]) {
+            el.textContent = lang_data[lang][key];
+          }
+        });
+        
+        document.querySelectorAll('[data-q]').forEach(el => {
+          const q = el.getAttribute('data-q');
+          if (lang_data[lang] && lang_data[lang]['q' + q]) {
+            el.textContent = lang_data[lang]['q' + q];
+          }
+        });
+
+        // Update language button styles
+        ['ko', 'en', 'cn'].forEach(l => {
+          const btn = document.getElementById('lang-' + l);
+          if (btn) {
+            if (l === lang) {
+              btn.className = 'px-4 py-2 rounded-lg bg-blue-600 text-white font-medium';
+            } else {
+              btn.className = 'px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium';
+            }
+          }
+        });
+      }
+
+      document.getElementById('isiForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const answers = {};
+        let score = 0;
+        
+        for (let i = 1; i <= 7; i++) {
+          const value = parseInt(formData.get('q' + i));
+          answers['q' + i] = value;
+          score += value;
+        }
+        
+        const level = score <= 7 ? 0 : score <= 14 ? 1 : score <= 21 ? 2 : 3;
+        
+        // Send to API
+        try {
+          const email = document.getElementById('email').value;
+          const sendEmail = document.getElementById('sendEmail').checked;
+          
+          await axios.post('/api/questionnaires/ISI/responses', {
+            answers,
+            score,
+            email: sendEmail ? email : undefined
+          });
+        } catch (error) {
+          console.error('Failed to save response:', error);
+        }
+        
+        // Display results
+        displayResults(score, level);
+      });
+
+      async function displayResults(score, level) {
+        document.getElementById('testSection').classList.add('hidden');
+        document.getElementById('resultSection').classList.remove('hidden');
+        
+        // Score Card
+        const scoreColors = ['bg-green-500', 'bg-yellow-500', 'bg-orange-500', 'bg-red-500'];
+        const scoreCard = document.getElementById('scoreCard');
+        scoreCard.innerHTML = `
+          <div class="text-center">
+            <div class="inline-block ${scoreColors[level]} text-white rounded-full w-32 h-32 flex items-center justify-center mb-4">
+              <div>
+                <div class="text-5xl font-bold">${score}</div>
+                <div class="text-sm">점</div>
+              </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">
+              ${lang_data.ko.interpretation[level]}
+            </h2>
+            <p class="text-gray-600">총 28점 만점 중 ${score}점입니다</p>
+          </div>
+        `;
+        
+        // Routine Card
+        const routineCard = document.getElementById('routineCard');
+        routineCard.innerHTML = `
+          <h3 class="text-2xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-lightbulb text-blue-600 mr-2"></i>
+            맞춤 수면 루틴 제안
+          </h3>
+          <div class="whitespace-pre-line text-gray-700 leading-relaxed">
+            ${lang_data.ko.routines[level]}
+          </div>
+        `;
+        
+        // YouTube Card
+        const video = lang_data.ko.videos[level];
+        const youtubeCard = document.getElementById('youtubeCard');
+        youtubeCard.innerHTML = `
+          <h3 class="text-2xl font-bold text-gray-800 mb-4">
+            <i class="fab fa-youtube text-red-600 mr-2"></i>
+            추천 영상
+          </h3>
+          <a href="${video.url}" target="_blank" class="text-blue-600 hover:text-blue-800 font-medium text-lg flex items-center">
+            <i class="fas fa-play-circle mr-2"></i>
+            ${video.title}
+          </a>
+        `;
+        
+        // Show clinic section for severe cases
+        if (level === 3) {
+          document.getElementById('clinicSection').classList.remove('hidden');
+          await loadClinics();
+        }
+        
+        // Scroll to results
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+      }
+
+      async function loadClinics() {
+        try {
+          const response = await axios.get('/api/clinics?city=서울');
+          const clinics = response.data.clinics || [];
+          
+          const clinicList = document.getElementById('clinicList');
+          clinicList.innerHTML = clinics.slice(0, 4).map(clinic => `
+            <div class="bg-white p-4 rounded-lg clinic-card">
+              <div class="flex items-start justify-between">
+                <div>
+                  <h4 class="font-bold text-lg text-gray-800">${clinic.name}</h4>
+                  <p class="text-sm text-gray-600">${clinic.address || clinic.city}</p>
+                  ${clinic.has_polysomnography ? '<span class="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">수면다원검사 가능</span>' : ''}
+                </div>
+                <div class="text-right">
+                  ${clinic.phone ? `<p class="text-sm text-gray-600"><i class="fas fa-phone mr-1"></i>${clinic.phone}</p>` : ''}
+                  ${clinic.url ? `<a href="${clinic.url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-external-link-alt mr-1"></i>웹사이트</a>` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('');
+        } catch (error) {
+          console.error('Failed to load clinics:', error);
+        }
+      }
+    </script>
+</body>
+</html>
