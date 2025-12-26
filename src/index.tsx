@@ -1176,112 +1176,175 @@ app.get('/', (c) => {
           .risk-low { background: linear-gradient(135deg, #10b981, #059669); }
           .risk-medium { background: linear-gradient(135deg, #f59e0b, #d97706); }
           .risk-high { background: linear-gradient(135deg, #ef4444, #dc2626); }
+          
+          /* Mobile optimizations */
+          .text-truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+          }
+          
+          /* Language dropdown */
+          .lang-dropdown {
+            position: relative;
+            display: inline-block;
+          }
+          .lang-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 120px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            z-index: 1000;
+            overflow: hidden;
+          }
+          .lang-dropdown:hover .lang-dropdown-content {
+            display: block;
+          }
+          .lang-dropdown-content button {
+            color: #1f2937;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+          }
+          .lang-dropdown-content button:hover {
+            background-color: #f3f4f6;
+          }
+          .lang-dropdown-content button.active {
+            background-color: #1f7ed6;
+            color: white;
+          }
         </style>
     </head>
     <body class="bg-gray-50">
         <!-- Header -->
         <header class="sleep-gradient text-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="max-w-7xl mx-auto px-3 py-3 md:py-4">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <i class="fas fa-moon text-3xl"></i>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-moon text-xl md:text-2xl"></i>
                         <div>
-                            <h1 class="text-2xl font-bold">SomniCare</h1>
-                            <p class="text-sm opacity-90">불면증 치료·케어 종합 플랫폼</p>
+                            <h1 class="text-lg md:text-xl font-bold">SomniCare</h1>
+                            <p class="text-xs opacity-90 hidden sm:block">불면증 치료·케어 플랫폼</p>
                         </div>
                     </div>
-                    <nav class="hidden md:flex space-x-6">
-                        <a href="/" class="hover:opacity-80">홈</a>
-                        <a href="/wellness" class="hover:opacity-80">웰니스</a>
-                        <a href="/assessment" class="hover:opacity-80">자가진단</a>
-                        <a href="/program" class="hover:opacity-80">프로그램</a>
-                        <a href="/clinics" class="hover:opacity-80">병원찾기</a>
-                    </nav>
+                    <div class="flex items-center gap-2 md:gap-4">
+                        <nav class="hidden md:flex space-x-4 text-sm">
+                            <a href="/" class="hover:opacity-80">홈</a>
+                            <a href="/wellness" class="hover:opacity-80">웰니스</a>
+                            <a href="/assessment" class="hover:opacity-80">자가진단</a>
+                            <a href="/program" class="hover:opacity-80">프로그램</a>
+                            <a href="/clinics" class="hover:opacity-80">병원찾기</a>
+                        </nav>
+                        <div class="lang-dropdown">
+                            <button class="px-3 py-1.5 bg-white bg-opacity-20 rounded-lg text-xs md:text-sm font-semibold hover:bg-opacity-30 transition flex items-center gap-1">
+                                <i class="fas fa-globe"></i>
+                                <span class="hidden sm:inline">한국어</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="lang-dropdown-content">
+                                <button class="active" onclick="alert('한국어가 선택되었습니다')">🇰🇷 한국어</button>
+                                <button onclick="alert('English - Coming soon!')">🇺🇸 English</button>
+                                <button onclick="alert('中文 - 即将推出!')">🇨🇳 中文</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- Hero Section -->
-        <section class="sleep-gradient text-white py-16">
-            <div class="max-w-7xl mx-auto px-4 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">
+        <section class="sleep-gradient text-white py-8 md:py-12">
+            <div class="max-w-7xl mx-auto px-3 text-center">
+                <h2 class="text-2xl md:text-4xl font-bold mb-3">
                     당신의 잠은 치료 받을 수 있습니다
                 </h2>
-                <p class="text-xl mb-8 opacity-90">
+                <p class="text-sm md:text-lg mb-6 opacity-90 text-truncate-2">
                     과학 기반 맞춤 수면 루틴 + 가족/보호자 케어 + 병원 연계까지 한 번에
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/assessment" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
-                        <i class="fas fa-clipboard-check mr-2"></i>
-                        무료 불면증 검사 시작
+                <div class="flex flex-col sm:flex-row gap-2 md:gap-3 justify-center">
+                    <a href="/assessment" class="bg-white text-blue-600 px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-bold text-sm md:text-base hover:bg-gray-100 transition">
+                        <i class="fas fa-clipboard-check mr-1"></i>
+                        무료 불면증 검사
                     </a>
-                    <a href="/program" class="bg-blue-800 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-900 transition border-2 border-white">
-                        <i class="fas fa-book-medical mr-2"></i>
-                        프로그램 둘러보기
+                    <a href="/program" class="bg-blue-800 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-lg font-bold text-sm md:text-base hover:bg-blue-900 transition border-2 border-white">
+                        <i class="fas fa-book-medical mr-1"></i>
+                        프로그램 보기
                     </a>
                 </div>
             </div>
         </section>
 
         <!-- Features Section -->
-        <section class="py-16 bg-white">
-            <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">
+        <section class="py-8 md:py-12 bg-white">
+            <div class="max-w-7xl mx-auto px-3">
+                <h2 class="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8 text-gray-800">
                     세상에 하나뿐인 차별화 기능
                 </h2>
-                <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
                     <!-- Feature 1 -->
-                    <div class="bg-blue-50 rounded-xl p-6 card-hover">
-                        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-chart-line text-white text-xl"></i>
+                    <div class="bg-blue-50 rounded-lg p-3 md:p-4 card-hover">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-chart-line text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">실시간 리스크 스코어</h3>
-                        <p class="text-gray-600">
-                            폰 센서 + 생활 행동 데이터로 불면 위험도를 실시간 분석
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">리스크 스코어</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2">
+                            폰 센서+생활 데이터로 불면 위험도 분석
                         </p>
                     </div>
 
                     <!-- Feature 2 -->
-                    <div class="bg-green-50 rounded-xl p-6 card-hover">
-                        <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-brain text-white text-xl"></i>
+                    <div class="bg-green-50 rounded-lg p-3 md:p-4 card-hover">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-green-600 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-brain text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">AI 맞춤 CBT-I</h3>
-                        <p class="text-gray-600">
-                            개인별 매일 업데이트되는 인지행동치료 프로토콜 자동 생성
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">AI 맞춤 CBT-I</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2">
+                            개인별 매일 업데이트 인지행동치료
                         </p>
                     </div>
 
                     <!-- Feature 3 - NEW Wellness -->
-                    <div class="bg-purple-50 rounded-xl p-6 card-hover cursor-pointer" onclick="window.location.href='/wellness'">
-                        <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-spa text-white text-xl"></i>
+                    <div class="bg-purple-50 rounded-lg p-3 md:p-4 card-hover cursor-pointer" onclick="window.location.href='/wellness'">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-purple-600 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-spa text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">웰니스 콘텐츠</h3>
-                        <p class="text-gray-600">
-                            음악·요가·호흡·ASMR 힐링 콘텐츠로 수면 보조
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">웰니스 콘텐츠</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2">
+                            음악·요가·호흡·ASMR 힐링 콘텐츠
                         </p>
                     </div>
 
                     <!-- Feature 4 -->
-                    <div class="bg-pink-50 rounded-xl p-6 card-hover">
-                        <div class="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-users text-white text-xl"></i>
+                    <div class="bg-pink-50 rounded-lg p-3 md:p-4 card-hover">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-pink-600 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-users text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">가족 케어 모드</h3>
-                        <p class="text-gray-600">
-                            시니어/환자 방 야간 감지 + 보호자 앱 실시간 연동
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">가족 케어 모드</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2">
+                            야간 감지+보호자 실시간 연동
                         </p>
                     </div>
 
                     <!-- Feature 5 -->
-                    <div class="bg-orange-50 rounded-xl p-6 card-hover">
-                        <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-hospital text-white text-xl"></i>
+                    <div class="bg-orange-50 rounded-lg p-3 md:p-4 card-hover">
+                        <div class="w-8 h-8 md:w-10 md:h-10 bg-orange-600 rounded-lg flex items-center justify-center mb-2">
+                            <i class="fas fa-hospital text-white text-sm md:text-base"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">병원 연계 시스템</h3>
-                        <p class="text-gray-600">
-                            전국 수면클리닉 검색 + 수면다원검사 가능 병원 매핑
+                        <h3 class="text-xs md:text-sm font-bold mb-1 text-gray-800">병원 연계</h3>
+                        <p class="text-xs text-gray-600 text-truncate-2">
+                            전국 수면클리닉+수면다원검사 병원
                         </p>
                     </div>
                 </div>
