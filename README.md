@@ -13,7 +13,58 @@
 
 ## 주요 기능 (완료된 기능)
 
-### ✅ 1. 불면증 자가진단 (ISI)
+### ✅ 1. 웰니스 콘텐츠 패키지 (신규!)
+불면 치료 보조 콘텐츠로 의료 신뢰감과 웰니스 감성을 조합한 무료 서비스
+
+**URL**: `/wellness`
+
+#### A) 수면 음악 플레이어 (`/wellness/music`)
+- α파/θ파 기반 안정 음악 (7종)
+- 호흡 동기화 BGM, 백색소음, 빗소리, 자연음
+- 타이머 기능 (10/20/30/60분)
+- 자동 페이드아웃 (슬립 타이머)
+- 심야 모드 (화면 밝기 최소화)
+- 볼륨 조절
+
+**특징**:
+- 클리닉 모드: 야간 각성 시 자동 재생 제안
+- 해외 사용자: 콘텐츠만 제공, 치료 표현 금지
+- API: `GET /api/wellness/music`
+
+#### B) 요가 & 스트레칭 (3종)
+- 취침 전 5분 이완 스트레칭
+- 복식호흡 + 목/어깨 긴장 완화 루틴
+- 기상 직후 몸 깨우기 3분 순환
+- 텍스트 + 일러스트 가이드
+- API: `GET /api/wellness/yoga`
+
+#### C) 호흡 안정 루틴 (4종)
+- 4-7-8 호흡법 (빠른 수면 유도)
+- 5-5-5 균형 호흡
+- 박스 호흡법 (긴장 완화)
+- 심박수 안정화 호흡 (10분)
+- 원형 애니메이션, 색상 흐름 효과
+- API: `GET /api/wellness/breathing`
+
+#### D) ASMR 사운드룸 (10종)
+- 빗소리, 파도, 장작, 숲 속 새소리
+- 백색/핑크/브라운 노이즈
+- 바이노럴 오디오 (이어폰 최적화)
+- 심야 모드, 무한 반복
+- API: `GET /api/wellness/asmr`
+
+#### E) 케어링 모드 API
+- QR 초대 시스템 (10분 만료)
+- 보호자-피보호자 연결
+- 실시간 알림 공유
+- API: `/api/care/invite`, `/api/care/accept`, `/api/care/alerts`
+
+**공공 사업용 안전 안내**:
+- 무료 제공
+- 의료 처방 대체 표현 금지
+- 중증 위험군 시 의료기관 안내 표출
+
+### ✅ 2. 불면증 자가진단 (ISI)
 - **7문항 ISI (Insomnia Severity Index)** 평가
 - 실시간 점수 계산 및 해석
 - 이메일 결과 전송 (선택)
@@ -42,7 +93,9 @@
 - 분당서울대병원 수면센터
 - 서울아산병원 수면다원검사실
 
-### ✅ 3. REST API 엔드포인트
+### ✅ 4. REST API 엔드포인트
+
+#### 기존 API
 - `GET /api/health` - 헬스체크
 - `GET /api/questionnaires` - 전체 설문 목록
 - `GET /api/questionnaires/:type` - 특정 설문 조회
@@ -57,7 +110,28 @@
 - `GET /api/cbt/programs/:id/modules` - 프로그램 모듈 조회
 - `GET /api/dashboard` - 사용자 대시보드 데이터
 
-### ✅ 4. 데이터베이스 (Cloudflare D1)
+#### 웰니스 API (신규!)
+- `GET /api/wellness/music` - 음악 콘텐츠 목록
+- `GET /api/wellness/music/:id` - 음악 상세 조회
+- `GET /api/wellness/yoga` - 요가 루틴 목록
+- `GET /api/wellness/yoga/:id` - 요가 루틴 상세
+- `GET /api/wellness/breathing` - 호흡 루틴 목록
+- `GET /api/wellness/breathing/:id` - 호흡 루틴 상세
+- `GET /api/wellness/asmr` - ASMR 사운드 목록
+- `POST /api/wellness/activity` - 활동 기록 저장
+- `GET /api/wellness/activities` - 사용자 활동 내역
+- `GET /api/wellness/preferences` - 사용자 선호도 조회
+- `POST /api/wellness/preferences` - 사용자 선호도 저장
+
+#### 케어링 모드 API (신규!)
+- `GET /api/care/links` - 케어 연결 목록
+- `POST /api/care/invite` - QR 초대 생성
+- `POST /api/care/accept` - QR 초대 수락
+- `GET /api/care/alerts` - 케어 알림 조회
+
+### ✅ 5. 데이터베이스 (Cloudflare D1)
+
+#### 기존 테이블 (15개)
 - **users** - 사용자 정보
 - **profiles** - 사용자 프로필
 - **sleep_sessions** - 수면 기록
@@ -72,6 +146,22 @@
 - **care_links** - 보호자 연결
 - **daily_habits** - 일일 습관 기록
 - **coach_conversations** - AI 코치 대화 기록
+- **permissions** - 권한 관리
+
+#### 웰니스 테이블 (신규 6개)
+- **music_content** - 수면 음악 콘텐츠 (7건)
+- **yoga_content** - 요가/스트레칭 루틴 (3건)
+- **breathing_routines** - 호흡 루틴 (4건)
+- **asmr_content** - ASMR 사운드 (10건)
+- **wellness_activities** - 사용자 활동 기록
+- **user_wellness_preferences** - 사용자 선호도
+
+#### 케어링 모드 테이블 (신규 3개)
+- **care_links** - 보호자-피보호자 연결
+- **care_invites** - QR 초대 토큰 (10분 만료)
+- **care_alerts** - 케어 알림 로그
+
+**총 테이블 수**: 24개
 
 ## 아직 구현하지 않은 기능
 
@@ -124,11 +214,14 @@ npm install
 
 ### 2. 데이터베이스 마이그레이션
 ```bash
-# 로컬 D1 데이터베이스에 스키마 적용
+# 로컬 D1 데이터베이스에 스키마 적용 (3개 마이그레이션)
 npm run db:migrate:local
 
-# 샘플 데이터 주입
+# 기본 샘플 데이터 주입
 npm run db:seed
+
+# 웰니스 샘플 데이터 주입 ⭐ 신규!
+npx wrangler d1 execute somnicare-production --local --file=./seed_wellness.sql
 ```
 
 ### 3. 빌드
@@ -168,10 +261,15 @@ webapp/
 │   └── index.tsx              # 메인 Hono 애플리케이션
 ├── public/
 │   └── static/
+│       ├── wellness.html      # 웰니스 허브 메인 ⭐ 신규!
+│       ├── music.html         # 음악 플레이어 ⭐ 신규!
 │       └── assessment.html    # ISI 자가진단 페이지
 ├── migrations/
-│   └── 0001_initial_schema.sql # DB 스키마
-├── seed.sql                   # 샘플 데이터
+│   ├── 0001_initial_schema.sql    # 초기 DB 스키마
+│   ├── 0002_wellness_content.sql  # 웰니스 콘텐츠 ⭐ 신규!
+│   └── 0003_caring_mode.sql       # 케어링 모드 ⭐ 신규!
+├── seed.sql                   # 기본 샘플 데이터
+├── seed_wellness.sql          # 웰니스 샘플 데이터 ⭐ 신규!
 ├── ecosystem.config.cjs       # PM2 설정
 ├── wrangler.jsonc            # Cloudflare 설정
 ├── package.json              # NPM 스크립트
@@ -181,6 +279,8 @@ webapp/
 ## URLs
 
 - **홈페이지**: `/`
+- **웰니스 허브**: `/wellness` ⭐ 신규!
+- **수면 음악**: `/wellness/music` ⭐ 신규!
 - **ISI 자가진단**: `/assessment`
 - **병원 찾기**: `/clinics`
 - **API 문서**: `/api/health` (헬스체크)
@@ -225,5 +325,6 @@ SomniCare Development Team - 2025
 
 ---
 
-**마지막 업데이트**: 2025-01-26
-**버전**: 0.1.0 (MVP)
+**마지막 업데이트**: 2025-12-26  
+**버전**: 0.2.0 (MVP + 웰니스 패키지 ⭐)  
+**상태**: ✅ 모든 시스템 정상 작동
